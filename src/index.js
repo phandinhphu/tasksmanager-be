@@ -22,10 +22,10 @@ app.use(helmet({
     crossOriginResourcePolicy: false
 }))
 
-const PORT = 8080 || process.env.PORT
+const PORT = process.env.PORT || 8000
 
 // Routes init
-routes(app);
+app.use('/api', routes)
 
 connectDB().then(() => {
     app.listen(PORT, () => {

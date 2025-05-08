@@ -1,7 +1,7 @@
+const express = require('express');
+const route = express.Router();
 const authRoutes = require('./auth');
 
-function routes(app) {
-    app.use('/auth', authRoutes);
-}
+route.use('/auth', authRoutes);
 
-module.exports = routes;
+module.exports = route;
