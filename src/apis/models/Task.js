@@ -20,6 +20,8 @@ const taskSchema = new Schema({
         start_date: { type: Date, required: true },
         end_date: { type: Date, required: true },
         extend_date: { type: Date },
+        createdAt: { type: Date, default: Date.now },
+        updatedAt: { type: Date, default: Date.now },
     }],
 }, {
     timestamps: true,
