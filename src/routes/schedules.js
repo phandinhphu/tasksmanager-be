@@ -9,5 +9,6 @@ route.use(verifyToken);
 route.get('/me', ScheduleController.getMySchedules);
 route.post('/create', ScheduleController.createSchedule);
 route.put('/:id', ScheduleController.updateSchedule);
+route.delete('/:id', ScheduleController.deleteSchedule);
 
 module.exports = route;

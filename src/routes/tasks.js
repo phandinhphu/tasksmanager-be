@@ -4,13 +4,16 @@ const TaskController = require('../apis/controllers/TaskController');
 
 const verifyToken = require('../middleware/auth');
 
-route.get('/status', TaskController.getAllStatus); // Get all task statuses
-route.get('/priority', TaskController.getAllPriority); // Get all task priorities
+route.get('/status', TaskController.getAllStatus);
+route.get('/priority', TaskController.getAllPriority);
 
 route.use(verifyToken);
-route.get('/me', TaskController.getMyTasks); // Get all tasks for the logged-in user
-route.post('/', TaskController.createTask); // Create a new task for the logged-in user
-route.put('/:id', TaskController.updateTask); // Update a task by ID for the logged-in user
-route.delete('/:id', TaskController.deleteTask); // Delete a task by ID for the logged-in user
+route.get('/me', TaskController.getMyTasks);
+route.get('/stats', TaskController.getTaskStats);
+route.post('/', TaskController.createTask);
+route.put('/:id', TaskController.updateTask);
+route.put('/:id/complete', TaskController.completeTask);
+route.put('/:id/subtasks/:subtaskId/complete', TaskController.completeSubtask);
+route.delete('/:id', TaskController.deleteTask);
 
 module.exports = route;

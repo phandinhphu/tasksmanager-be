@@ -7,12 +7,32 @@ class TaskController {
     async getMyTasks(req, res) {
         try {
             const userId = req.user.id; // Assuming you have user ID in req.user
-            const tasks = await taskSchema.find({ userid: userId })
+            const tasks = await taskSchema.find({ userid: userId });
+
+            // Compare the tasks with the current date and update before response
+            const currentDate = new Date();
+
+            const inProgressStatus = await statusSchema.findOne({ name: 'In Progress' });
+            const overdueStatus = await statusSchema.findOne({ name: 'Overdue' });
+
+            tasks.forEach(task => {
+                if (!task.completed && new Date(task.start_date) >= currentDate) {
+                    task.status = inProgressStatus._id;
+                } else if (!task.completed && new Date(task.end_date) < currentDate) {
+                    task.status = overdueStatus._id;
+                }
+            });
+
+            await Promise.all(tasks.map(task => task.save()));
+
+            const newTasks = await taskSchema.find({ userid: userId })
                 .populate('status').populate('priority').populate('subtasks.status').populate('subtasks.priority');
-            return res.status(200).json(tasks);
+
+            // Return the tasks
+            return res.status(200).json(newTasks);
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ message: 'Internal server error', error  });
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
         }
     }
 
@@ -37,7 +57,7 @@ class TaskController {
             return res.status(201).json(newTask);
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ message: 'Internal server error' });
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
 
@@ -65,7 +85,62 @@ class TaskController {
             return res.status(200).json(updatedTask);
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ message: 'Internal server error' });
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+        }
+    }
+
+    // [PUT] /tasks/:id/complete
+    async completeTask(req, res) {
+        try {
+            const taskId = req.params.id;
+
+            const completedStatus = await statusSchema.findOne({ name: 'Completed' });
+            if (!completedStatus) {
+                return res.status(404).json({ message: 'Status not found' });
+            }
+
+            const updatedTask = await taskSchema.findByIdAndUpdate(taskId, { completed: true, status: completedStatus._id }, { new: true });
+
+            if (!updatedTask) {
+                return res.status(404).json({ message: 'Task not found' });
+            }
+
+            return res.status(200).json(updatedTask);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
+        }
+    }
+
+    // [PUT] /tasks/:id/subtasks/:subtaskId/complete
+    async completeSubtask(req, res) {
+        try {
+            const taskId = req.params.id;
+            const subtaskId = req.params.subtaskId;
+
+            const completedSubtask = await statusSchema.findOne({ name: 'Completed' });
+            if (!completedSubtask) {
+                return res.status(404).json({ message: 'Status not found' });
+            }
+
+            const task = await taskSchema.findById(taskId);
+            if (!task) {
+                return res.status(404).json({ message: 'Task not found' });
+            }
+
+            const subtask = task.subtasks.id(subtaskId);
+            if (!subtask) {
+                return res.status(404).json({ message: 'Subtask not found' });
+            }
+
+            subtask.completed = true;
+            subtask.status = completedSubtask._id;
+            await task.save();
+
+            return res.status(200).json(task);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
 
@@ -94,7 +169,7 @@ class TaskController {
             return res.status(200).json({ message: 'Task deleted successfully' });
         } catch (error) {
             console.error('Error deleting task:', error);
-            return res.status(500).json({ message: 'Internal server error' });
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
 
@@ -105,7 +180,7 @@ class TaskController {
             return res.status(200).json(statuses);
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ message: 'Internal server error' });
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
 
@@ -116,10 +191,35 @@ class TaskController {
             return res.status(200).json(priorities);
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ message: 'Internal server error' });
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
 
+    // [GET] /tasks/stats
+    async getTaskStats(req, res) {
+        try {
+            const userId = req.user.id;
+            const tasks = await taskSchema.find({ userid: userId }).populate('status');
+
+            const completed = tasks.filter(task => task.completed).length;
+            const inProgress = tasks.filter(task => task.status.name === 'In Progress').length;
+            const overdue = tasks.filter(task => task.status.name === 'Overdue').length;
+            const subtasks = tasks.reduce((sum, task) => sum + (task.subtasks?.length || 0), 0);
+
+            const stats = {
+                total: tasks.length,
+                completed: completed,
+                inProgress: inProgress,
+                overdue: overdue,
+                subtasks: subtasks
+            };
+
+            return res.status(200).json(stats);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+        }
+    }
 }
 
 module.exports = new TaskController();

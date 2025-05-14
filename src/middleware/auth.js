@@ -17,6 +17,6 @@ module.exports = (req, res, next) => {
         next(); // Proceed to the next middleware or route handler
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: 'Internal server error', error });
+        return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
     }
 }
