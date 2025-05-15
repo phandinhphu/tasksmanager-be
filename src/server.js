@@ -12,7 +12,7 @@ dotenv.config();
 const server = http.createServer(app);
 socketManager.init(server); // Khởi tạo socket
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 connectDB().then(() => {
     server.listen(PORT, () => {
