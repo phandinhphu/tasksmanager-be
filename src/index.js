@@ -4,6 +4,7 @@ const dotenv = require('dotenv')
 const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
 const helmet = require('helmet')
+const fileUpload = require('express-fileupload') // Thêm import
 const connectDB = require('./config/db')
 const routes = require('./routes');
 
@@ -21,14 +22,15 @@ app.use(morgan('dev'))
 app.use(helmet({
     crossOriginResourcePolicy: false
 }))
+// Thêm middleware fileUpload
+app.use(fileUpload({
+    useTempFiles: true,
+    tempFileDir: '/tmp/'
+}))
 
 const PORT = process.env.PORT || 8000
 
 // Routes init
 app.use('/api', routes)
 
-connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`)
-    })
-})
+module.exports = app

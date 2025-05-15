@@ -30,7 +30,7 @@ class AuthController {
             await newUser.save();
             return res.status(201).json({ message: 'User registered successfully' });
         } catch (error) {
-            return res.status(500).json({ message: 'Internal server error' });
+            return res.status(500).json({ message: 'Something error, please try again!' });
         }
     }
 
@@ -50,17 +50,30 @@ class AuthController {
             if (!isPasswordValid) {
                 return res.status(400).json({ message: 'Invalid email or password' });
             }
-
+            
             // Generate JWT token
             const token = jwt.sign({ 
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                createdAt: user.createdAt
             }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
-            return res.status(200).json({ token });
+            // Return user info (without password) along with token
+            const userResponse = {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                createdAt: user.createdAt
+            };
+
+            return res.status(200).json({ 
+                token,
+                user: userResponse
+            });
         } catch (error) {
-            return res.status(500).json({ message: 'Internal server error' });
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
 }
