@@ -6,7 +6,7 @@ class TaskController {
     // [GET] /tasks/me
     async getMyTasks(req, res) {
         try {
-            const userId = req.user.id; // Assuming you have user ID in req.user
+            const userId = req.user._id; // Assuming you have user ID in req.user
             const tasks = await taskSchema.find({ userid: userId });
 
             // Compare the tasks with the current date and update before response
@@ -40,7 +40,7 @@ class TaskController {
     async createTask(req, res) {
         try {
             const { task_name, task_description, status, priority, start_date, end_date, subtasks } = req.body;
-            const userId = req.user.id; // Assuming you have user ID in req.user
+            const userId = req.user._id; // Assuming you have user ID in req.user
 
             const newTask = new taskSchema({
                 task_name,

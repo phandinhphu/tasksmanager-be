@@ -53,13 +53,27 @@ class AuthController {
             
             // Generate JWT token
             const token = jwt.sign({ 
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                createdAt: user.createdAt
+                id: user._id
             }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
-            return res.status(200).json({ token });
+            res.cookie('token', token, {
+                httpOnly: true,       // Không cho JS truy cập
+                secure: process.env.NODE_ENV === 'production', // HTTPS ở production
+                sameSite: 'Strict',   // Chặn CSRF cơ bản
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+            })
+
+            res.json({ message: 'Logged in successfully' });
+        } catch (error) {
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+        }
+    }
+
+    // [POST] /auth/logout
+    async logout(req, res, next) {
+        try {
+            res.clearCookie('token');
+            return res.status(200).json({ message: 'Logged out successfully' });
         } catch (error) {
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
