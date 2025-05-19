@@ -7,6 +7,6 @@ const verifyToken = require('../middleware/auth');
 route.use(verifyToken);
 
 route.get('/me', UserController.getMe);
-route.post('/me/update-profile', UserController.updateProfile);
+route.put('/me/update-profile', UserController.updateProfile);
 
 module.exports = route;

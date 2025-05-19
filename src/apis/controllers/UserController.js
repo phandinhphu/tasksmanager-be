@@ -21,7 +21,7 @@ class UserController {
         try {
             const { name, password, avatar } = req.body;
             const userId = req.user._id;
-
+            
             // Check if the user exists
             const user = await userSchema.findById(userId);
             if (!user) {
@@ -49,7 +49,9 @@ class UserController {
             // Save the updated user
             await user.save();
 
-            return res.status(200).json({ message: 'Profile updated successfully', user });
+            const updatedUser = await userSchema.findById(userId).select('-password -__v');
+
+            return res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
         } catch (error) {
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
