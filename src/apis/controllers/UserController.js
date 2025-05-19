@@ -1,13 +1,6 @@
 const bcrypt = require('bcryptjs');
 const userSchema = require('../models/User');
-const cloudinary = require('cloudinary').v2;
-const { cloud_name, api_key, api_secret } = require('../../config/cloudinary');
-
-cloudinary.config({
-    cloud_name,
-    api_key,
-    api_secret
-});
+const cloudinary = require('../../config/cloudinary');
 
 class UserController {
     // [GET] /user/me
@@ -23,10 +16,10 @@ class UserController {
         }
     }    
 
-    // [POST] user/update-profile
+    // [POST] user/me/update-profile
     async updateProfile(req, res, next) {
         try {
-            const { name, password, avatar, avatar_id } = req.body;
+            const { name, password, avatar } = req.body;
             const userId = req.user._id;
 
             // Check if the user exists
@@ -35,17 +28,23 @@ class UserController {
                 return res.status(404).json({ message: 'User not found' });
             }
 
-            // Check if user have old avatar
-            if (user.avatar_id !== "default-avatar" && avatar && user.avatar) {
-                // Delete the old avatar from Cloudinary
-                await cloudinary.uploader.destroy(user.avatar_id);
+            // Overwrite the avatar if provided
+            if (avatar) {
+                // Upload the new avatar to Cloudinary
+                const uploadResponse = await cloudinary.uploader.upload(avatar, {
+                    folder: 'avatars',
+                    public_id: user.avatar_id,
+                    overwrite: true,
+                });
+
+                // Update the user's avatar and avatar_id
+                user.avatar = uploadResponse.secure_url;
+                user.avatar_id = uploadResponse.public_id;
             }
 
             // Update the user's profile
             user.name = name || user.name;
             user.password = password ? await bcrypt.hash(password, 10) : user.password;
-            user.avatar = avatar || user.avatar;
-            user.avatar_id = avatar_id || user.avatar_id;
 
             // Save the updated user
             await user.save();
