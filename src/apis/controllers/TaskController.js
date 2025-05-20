@@ -16,6 +16,16 @@ class TaskController {
             const overdueStatus = await statusSchema.findOne({ name: 'Overdue' });
 
             tasks.forEach(task => {
+                if (task.subtasks && task.subtasks.length > 0) {
+                    task.subtasks.forEach(subtask => {
+                        if (!subtask.completed && new Date(subtask.start_date) >= currentDate) {
+                            subtask.status = inProgressStatus._id;
+                        } else if (!subtask.completed && new Date(subtask.end_date) < currentDate) {
+                            subtask.status = overdueStatus._id;
+                        }
+                    });
+                }
+
                 if (!task.completed && new Date(task.start_date) >= currentDate) {
                     task.status = inProgressStatus._id;
                 } else if (!task.completed && new Date(task.end_date) < currentDate) {
