@@ -18,17 +18,23 @@ class TaskController {
             tasks.forEach(task => {
                 if (task.subtasks && task.subtasks.length > 0) {
                     task.subtasks.forEach(subtask => {
-                        if (!subtask.completed && new Date(subtask.start_date) >= currentDate) {
+                        const subStart = new Date(subtask.start_date);
+                        const subEnd = new Date(subtask.end_date);
+
+                        if (!subtask.completed && subStart <= currentDate && currentDate <= subEnd) {
                             subtask.status = inProgressStatus._id;
-                        } else if (!subtask.completed && new Date(subtask.end_date) < currentDate) {
+                        } else if (!subtask.completed && subEnd < currentDate) {
                             subtask.status = overdueStatus._id;
                         }
                     });
                 }
 
-                if (!task.completed && new Date(task.start_date) >= currentDate) {
+                const taskStart = new Date(task.start_date);
+                const taskEnd = new Date(task.end_date);
+
+                if (!task.completed && taskStart <= currentDate && currentDate <= taskEnd) {
                     task.status = inProgressStatus._id;
-                } else if (!task.completed && new Date(task.end_date) < currentDate) {
+                } else if (!task.completed && taskEnd < currentDate) {
                     task.status = overdueStatus._id;
                 }
             });
@@ -43,6 +49,27 @@ class TaskController {
         } catch (error) {
             console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
+        }
+    }
+
+    // [GET] /tasks/:id
+    async getTaskById(req, res) {
+        try {
+            const taskId = req.params.id;
+            const task = await taskSchema.findById(taskId)
+                .populate('status')
+                .populate('priority')
+                .populate('subtasks.status')
+                .populate('subtasks.priority');
+
+            if (!task) {
+                return res.status(404).json({ message: 'Task not found' });
+            }
+
+            return res.status(200).json(task);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
 

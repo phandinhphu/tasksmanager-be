@@ -9,6 +9,7 @@ route.get('/priority', TaskController.getAllPriority);
 
 route.use(verifyToken);
 route.get('/me', TaskController.getMyTasks);
+route.get('/:id', TaskController.getTaskById);
 route.get('/stats', TaskController.getTaskStats);
 route.post('/', TaskController.createTask);
 route.put('/:id', TaskController.updateTask);
