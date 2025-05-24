@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const crypto = require('crypto');
 const userSchema = require('../models/User');
+const sendVerificationEmail = require('../../util/sendVerificationEmail');
 
 dotenv.config();
 
@@ -19,16 +21,22 @@ class AuthController {
 
             // Hash the password
             const hashedPassword = await bcrypt.hash(password, 10);
+            // Generate verification token
+            const verifyToken = crypto.randomBytes(32).toString('hex');
 
             // Create a new user
             const newUser = new userSchema({
                 name,
                 email,
                 password: hashedPassword,
+                verifyToken,
             });
 
+            // Send verification email
+            await sendVerificationEmail(email, verifyToken);
+
             await newUser.save();
-            return res.status(201).json({ message: 'User registered successfully' });
+            return res.status(201).json({ message: 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn.' });
         } catch (error) {
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
@@ -42,13 +50,18 @@ class AuthController {
             // Check if user exists
             const user = await userSchema.findOne({ email });
             if (!user) {
-                return res.status(400).json({ message: 'Invalid email or password' });
+                return res.status(400).json({ message: 'Email hoặc mật khẩu không hợp lệ' });
             }
 
             // Check password
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
-                return res.status(400).json({ message: 'Invalid email or password' });
+                return res.status(400).json({ message: 'Email hoặc mật khẩu không hợp lệ' });
+            }
+
+            // Check if user is verified
+            if (!user.verified) {
+                return res.status(400).json({ message: 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản của bạn.' });
             }
             
             // Generate JWT token
@@ -61,9 +74,9 @@ class AuthController {
                 secure: process.env.NODE_ENV === 'production', // HTTPS ở production
                 sameSite: 'Strict',   // Chặn CSRF cơ bản
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-            })
+            });
 
-            res.json({ message: 'Logged in successfully' });
+            res.json({ message: 'Đăng nhập thành công' });
         } catch (error) {
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
@@ -73,9 +86,31 @@ class AuthController {
     async logout(req, res, next) {
         try {
             res.clearCookie('token');
-            return res.status(200).json({ message: 'Logged out successfully' });
+            return res.status(200).json({ message: 'Đăng xuất thành công' });
         } catch (error) {
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+        }
+    }
+
+    // [GET] /auth/verify-email
+    async verifyEmail(req, res, next) {
+        const { token } = req.query;
+
+        try {
+            // Find user by verification token
+            const user = await userSchema.findOne({ verifyToken: token });
+            if (!user) {
+                return res.status(400).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
+            }
+
+            // Update user to verified
+            user.verified = true;
+            user.verifyToken = null; // Clear the verification token
+            await user.save();
+
+            return res.redirect(`${process.env.FRONTEND_URL}/verify-success`);
+        } catch (error) {
+            return res.redirect(`${process.env.FRONTEND_URL}/verify-fail`);
         }
     }
 }
