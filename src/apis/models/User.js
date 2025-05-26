@@ -9,6 +9,7 @@ const userSchema = new Schema({
     avatar_id: { type: String, default: 'default-avatar' },
     verified: { type: Boolean, default: false },
     verifyToken: { type: String, default: null },
+    forgotPasswordToken: { type: String, default: null },
     googleId: { type: String, default: null },
     facebookId: { type: String, default: null },
 }, {

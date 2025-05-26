@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
 const userSchema = require('../models/User');
-const sendVerificationEmail = require('../../util/sendVerificationEmail');
+const { sendVerificationEmail, sendResetPasswordEmail } = require('../../util/sendEmail');
 
 dotenv.config();
 
@@ -111,6 +111,57 @@ class AuthController {
             return res.redirect(`${process.env.FRONTEND_URL}/verify-success`);
         } catch (error) {
             return res.redirect(`${process.env.FRONTEND_URL}/verify-fail`);
+        }
+    }
+
+    // [POST] /auth/forgot-password
+    async forgotPassword(req, res, next) {
+        const { email } = req.body;
+
+        try {
+            // Find user by email
+            const user = await userSchema.findOne({ email });
+            if (!user) {
+                return res.status(400).json({ message: 'Email không tồn tại' });
+            }
+
+            // Generate reset token
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            user.forgotPasswordToken = resetToken;
+            await user.save();
+
+            // Send reset password email
+            await sendResetPasswordEmail(email, resetToken);
+
+            return res.status(200).json({ message: 'Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.' });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+        }
+    }
+
+    // [POST] /auth/reset-password
+    async resetPassword(req, res, next) {
+        const { token, newPassword } = req.body;
+
+        try {
+            // Find user by reset token
+            const user = await userSchema.findOne({ forgotPasswordToken: token });
+            if (!user) {
+                return res.status(400).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
+            }
+
+            // Hash the new password
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            // Update user's password and clear reset token
+            user.password = hashedPassword;
+            user.resetToken = null;
+
+            await user.save();
+
+            return res.status(200).json({ message: 'Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập với mật khẩu mới.' });
+        } catch (error) {
+            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
 }

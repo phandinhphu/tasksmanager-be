@@ -11,6 +11,8 @@ route.post('/login', AuthController.login);
 route.post('/register', AuthController.register);
 route.post('/logout', AuthController.logout);
 route.get('/verify-email', AuthController.verifyEmail);
+route.post('/forgot-password', AuthController.forgotPassword);
+route.post('/reset-password', AuthController.resetPassword);
 
 // Google authentication
 route.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
