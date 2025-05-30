@@ -19,7 +19,7 @@ class TaskController {
                 if (task.subtasks && task.subtasks.length > 0) {
                     task.subtasks.forEach(subtask => {
                         const subStart = new Date(subtask.start_date);
-                        const subEnd = new Date(subtask.end_date);
+                        const subEnd = subtask?.extend_date ? new Date(subtask.extend_date) : new Date(subtask.end_date);
 
                         if (!subtask.completed && subStart <= currentDate && currentDate <= subEnd) {
                             subtask.status = inProgressStatus._id;
@@ -30,7 +30,7 @@ class TaskController {
                 }
 
                 const taskStart = new Date(task.start_date);
-                const taskEnd = new Date(task.end_date);
+                const taskEnd = task?.extend_date ? new Date(task.extend_date) : new Date(task.end_date);
 
                 if (!task.completed && taskStart <= currentDate && currentDate <= taskEnd) {
                     task.status = inProgressStatus._id;
@@ -235,7 +235,7 @@ class TaskController {
     // [GET] /tasks/stats
     async getTaskStats(req, res) {
         try {
-            const userId = req.user.id;
+            const userId = req.user._id;
             const tasks = await taskSchema.find({ userid: userId }).populate('status');
 
             const completed = tasks.filter(task => task.completed).length;

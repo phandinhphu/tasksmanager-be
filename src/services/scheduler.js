@@ -22,11 +22,12 @@ cron.schedule("*/15 * * * *", async () => {
         // Kiểm tra task có subtasks không
         if (task.subtasks && task.subtasks.length > 0) {
             // Kiểm tra nếu có subtask quá hạn hoặc sắp đến hạn thì gửi thông báo
-            const hasOverdueSubtask = task.subtasks.some(subtask => {
+            const hasOverdueSubtask = task.subtasks.filter(subtask => {
                 return subtask.end_date < now || (subtask.end_date >= now && subtask.end_date <= threeDaysLater);
             });
 
-            if (hasOverdueSubtask) {
+            if (hasOverdueSubtask.length > 0) {
+                // Gửi thông báo cho từng subtask quá hạn hoặc sắp đến hạn
                 hasOverdueSubtask.forEach(subtask => {
                     const message = subtask.end_date < now
                         ? `Subtask "${subtask.subtask_name}" đã quá hạn!`
