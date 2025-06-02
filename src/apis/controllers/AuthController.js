@@ -39,16 +39,14 @@ class AuthController {
       await sendVerificationEmail(email, verifyToken);
 
       await newUser.save();
-      return res
-        .status(201)
-        .json({
-          message:
-            "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
-        });
+      return res.status(201).json({
+        message:
+          "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
+      });
     } catch (error) {
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -75,12 +73,10 @@ class AuthController {
 
       // Check if user is verified
       if (!user.verified) {
-        return res
-          .status(400)
-          .json({
-            message:
-              "Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
-          });
+        return res.status(400).json({
+          message:
+            "Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
+        });
       }
 
       // Generate JWT token
@@ -103,7 +99,7 @@ class AuthController {
     } catch (error) {
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -115,7 +111,7 @@ class AuthController {
     } catch (error) {
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -162,16 +158,14 @@ class AuthController {
       // Send reset password email
       await sendResetPasswordEmail(email, resetToken);
 
-      return res
-        .status(200)
-        .json({
-          message: "Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.",
-        });
+      return res.status(200).json({
+        message: "Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.",
+      });
     } catch (error) {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -196,16 +190,14 @@ class AuthController {
 
       await user.save();
 
-      return res
-        .status(200)
-        .json({
-          message:
-            "Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập với mật khẩu mới.",
-        });
+      return res.status(200).json({
+        message:
+          "Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập với mật khẩu mới.",
+      });
     } catch (error) {
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 }

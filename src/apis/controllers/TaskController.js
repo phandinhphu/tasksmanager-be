@@ -68,7 +68,7 @@ class TaskController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!", error });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!", error });
     }
   }
 
@@ -92,7 +92,7 @@ class TaskController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -127,7 +127,7 @@ class TaskController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -170,7 +170,7 @@ class TaskController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -199,7 +199,7 @@ class TaskController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!", error });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!", error });
     }
   }
 
@@ -235,7 +235,7 @@ class TaskController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -266,7 +266,7 @@ class TaskController {
       console.error("Error deleting task:", error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -279,7 +279,7 @@ class TaskController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -292,7 +292,7 @@ class TaskController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -329,7 +329,7 @@ class TaskController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 }
