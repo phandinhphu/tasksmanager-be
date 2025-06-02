@@ -1,81 +1,213 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-const userSchema = require('../models/User');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+const crypto = require("crypto");
+const userSchema = require("../models/User");
+const {
+  sendVerificationEmail,
+  sendResetPasswordEmail,
+} = require("../../util/sendEmail");
 
 dotenv.config();
 
 class AuthController {
-    // [POST] /auth/register
-    async register(req, res, next) {
-        const { name, email, password } = req.body;
+  // [POST] /auth/register
+  async register(req, res, next) {
+    const { name, email, password } = req.body;
 
-        try {
-            // Check if user already exists
-            const existingUser = await userSchema.findOne({ email });
-            if (existingUser) {
-                return res.status(400).json({ message: 'Email already exists' });
-            }
+    try {
+      // Check if user already exists
+      const existingUser = await userSchema.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
 
-            // Hash the password
-            const hashedPassword = await bcrypt.hash(password, 10);
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      // Generate verification token
+      const verifyToken = crypto.randomBytes(32).toString("hex");
 
-            // Create a new user
-            const newUser = new userSchema({
-                name,
-                email,
-                password: hashedPassword,
-            });
+      // Create a new user
+      const newUser = new userSchema({
+        name,
+        email,
+        password: hashedPassword,
+        verifyToken,
+      });
 
-            await newUser.save();
-            return res.status(201).json({ message: 'User registered successfully' });
-        } catch (error) {
-            return res.status(500).json({ message: 'Something error, please try again!' });
-        }
+      // Send verification email
+      await sendVerificationEmail(email, verifyToken);
+
+      await newUser.save();
+      return res
+        .status(201)
+        .json({
+          message:
+            "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
+        });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
     }
+  }
 
-    // [POST] /auth/login
-    async login(req, res, next) {
-        const { email, password } = req.body;
-        
-        try {
-            // Check if user exists
-            const user = await userSchema.findOne({ email });
-            if (!user) {
-                return res.status(400).json({ message: 'Invalid email or password' });
-            }
+  // [POST] /auth/login
+  async login(req, res, next) {
+    const { email, password } = req.body;
 
-            // Check password
-            const isPasswordValid = await bcrypt.compare(password, user.password);
-            if (!isPasswordValid) {
-                return res.status(400).json({ message: 'Invalid email or password' });
-            }
-            
-            // Generate JWT token
-            const token = jwt.sign({ 
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                createdAt: user.createdAt
-            }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+    try {
+      // Check if user exists
+      const user = await userSchema.findOne({ email });
+      if (!user) {
+        return res
+          .status(400)
+          .json({ message: "Email hoặc mật khẩu không hợp lệ" });
+      }
 
-            // Return user info (without password) along with token
-            const userResponse = {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                avatar: user.avatar,
-                createdAt: user.createdAt
-            };
+      // Check password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res
+          .status(400)
+          .json({ message: "Email hoặc mật khẩu không hợp lệ" });
+      }
 
-            return res.status(200).json({ 
-                token,
-                user: userResponse
-            });
-        } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
-        }
+      // Check if user is verified
+      if (!user.verified) {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
+          });
+      }
+
+      // Generate JWT token
+      const token = jwt.sign(
+        {
+          id: user._id,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN },
+      );
+
+      res.cookie("token", token, {
+        httpOnly: true, // Không cho JS truy cập
+        secure: process.env.NODE_ENV === "production", // HTTPS ở production
+        sameSite: "Strict", // Chặn CSRF cơ bản
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      });
+
+      res.json({ message: "Đăng nhập thành công" });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
     }
+  }
+
+  // [POST] /auth/logout
+  async logout(req, res, next) {
+    try {
+      res.clearCookie("token");
+      return res.status(200).json({ message: "Đăng xuất thành công" });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+    }
+  }
+
+  // [GET] /auth/verify-email
+  async verifyEmail(req, res, next) {
+    const { token } = req.query;
+
+    try {
+      // Find user by verification token
+      const user = await userSchema.findOne({ verifyToken: token });
+      if (!user) {
+        return res
+          .status(400)
+          .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+      }
+
+      // Update user to verified
+      user.verified = true;
+      user.verifyToken = null; // Clear the verification token
+      await user.save();
+
+      return res.redirect(`${process.env.FRONTEND_URL}/verify-success`);
+    } catch (error) {
+      return res.redirect(`${process.env.FRONTEND_URL}/verify-fail`);
+    }
+  }
+
+  // [POST] /auth/forgot-password
+  async forgotPassword(req, res, next) {
+    const { email } = req.body;
+
+    try {
+      // Find user by email
+      const user = await userSchema.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: "Email không tồn tại" });
+      }
+
+      // Generate reset token
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      user.forgotPasswordToken = resetToken;
+      await user.save();
+
+      // Send reset password email
+      await sendResetPasswordEmail(email, resetToken);
+
+      return res
+        .status(200)
+        .json({
+          message: "Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.",
+        });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+    }
+  }
+
+  // [POST] /auth/reset-password
+  async resetPassword(req, res, next) {
+    const { token, newPassword } = req.body;
+
+    try {
+      // Find user by reset token
+      const user = await userSchema.findOne({ forgotPasswordToken: token });
+      if (!user) {
+        return res
+          .status(400)
+          .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+      }
+
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      // Update user's password and clear reset token
+      user.password = hashedPassword;
+      user.resetToken = null;
+
+      await user.save();
+
+      return res
+        .status(200)
+        .json({
+          message:
+            "Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập với mật khẩu mới.",
+        });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+    }
+  }
 }
 
 module.exports = new AuthController();

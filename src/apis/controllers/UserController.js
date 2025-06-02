@@ -1,66 +1,69 @@
-const User = require('../models/User');
-const cloudinary = require('cloudinary').v2;
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-// Cấu hình Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const bcrypt = require("bcryptjs");
+const userSchema = require("../models/User");
+const cloudinary = require("../../config/cloudinary");
 
 class UserController {
-  // [GET] /users/me
-  async getProfile(req, res) {
+  // [GET] /user/me
+  async getMe(req, res, next) {
     try {
-      const userId = req.user.id;
-      const user = await User.findById(userId).select('-password');
-      
+      const user = req.user;
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(401).json({ message: "Unauthorized" });
       }
-      
       return res.status(200).json(user);
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!' });
+      return res
+        .status(500)
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
-  // [PUT] /users/me/avatar
-  async updateAvatar(req, res) {
+  // [POST] user/me/update-profile
+  async updateProfile(req, res, next) {
     try {
-      const userId = req.user.id;
-      
-      if (!req.files || !req.files.avatar) {
-        return res.status(400).json({ message: 'Không có file avatar nào được tải lên' });
+      const { name, password, avatar } = req.body;
+      const userId = req.user._id;
+
+      // Check if the user exists
+      const user = await userSchema.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
       }
-      
-      const file = req.files.avatar;
-      
-      // Upload lên Cloudinary
-      const result = await cloudinary.uploader.upload(file.tempFilePath, {
-        folder: 'user_avatars',
-        public_id: `user_${userId}`,
-        overwrite: true
-      });
-      
-      // Cập nhật user profile với URL avatar
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { avatar: result.secure_url },
-        { new: true }
-      ).select('-password');
-      
-      return res.status(200).json({
-        message: 'Avatar đã được cập nhật thành công',
-        user: updatedUser
-      });
+
+      // Overwrite the avatar if provided
+      if (avatar) {
+        // Upload the new avatar to Cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(avatar, {
+          folder: "avatars",
+          public_id: user.avatar_id,
+          overwrite: true,
+        });
+
+        // Update the user's avatar and avatar_id
+        user.avatar = uploadResponse.secure_url;
+        user.avatar_id = uploadResponse.public_id;
+      }
+
+      // Update the user's profile
+      user.name = name || user.name;
+      user.password = password
+        ? await bcrypt.hash(password, 10)
+        : user.password;
+
+      // Save the updated user
+      await user.save();
+
+      const updatedUser = await userSchema
+        .findById(userId)
+        .select("-password -__v");
+
+      return res
+        .status(200)
+        .json({ message: "Profile updated successfully", user: updatedUser });
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: 'Có lỗi xảy ra khi tải lên avatar' });
+      return res
+        .status(500)
+        .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
     }
   }
 }
