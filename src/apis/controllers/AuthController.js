@@ -186,7 +186,7 @@ class AuthController {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       // Update user's password and clear reset token
       user.password = hashedPassword;
-      user.resetToken = null;
+      user.forgotPasswordToken = null;
 
       await user.save();
 
