@@ -6,7 +6,7 @@ class ScheduleController {
   // [GET] /schedules/me
   async getMySchedules(req, res) {
     try {
-      const userId = req.user.id; // Assuming you have user ID in req.user
+      const userId = req.user._id; // Assuming you have user ID in req.user
       const schedules = await scheduleSchema.find({ userid: userId });
       return res.status(200).json(schedules);
     } catch (error) {
