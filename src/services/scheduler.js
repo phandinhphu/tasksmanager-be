@@ -13,8 +13,6 @@ cron.schedule("*/15 * * * *", async () => {
   if (!status) return;
 
   const tasks = await Task.find({
-    status: status._id,
-    end_date: { $lte: threeDaysLater },
     completed: false,
   }).populate("userid status");
 
@@ -23,41 +21,61 @@ cron.schedule("*/15 * * * *", async () => {
     if (task.subtasks && task.subtasks.length > 0) {
       // Kiểm tra nếu có subtask quá hạn hoặc sắp đến hạn thì gửi thông báo
       const hasOverdueSubtask = task.subtasks.filter((subtask) => {
+        const subStart = new Date(subtask.start_date);
+        const subEnd = subtask?.extend_date
+          ? new Date(subtask.extend_date)
+          : new Date(subtask.end_date);
+
         return (
-          subtask.end_date < now ||
-          (subtask.end_date >= now && subtask.end_date <= threeDaysLater)
+          (subEnd < now || (subEnd >= now && subEnd <= threeDaysLater)) &&
+          subStart <= now
         );
       });
 
       if (hasOverdueSubtask.length > 0) {
         // Gửi thông báo cho từng subtask quá hạn hoặc sắp đến hạn
         hasOverdueSubtask.forEach((subtask) => {
+          const subEnd = subtask?.extend_date
+            ? new Date(subtask.extend_date)
+            : new Date(subtask.end_date);
+
           const message =
-            subtask.end_date < now
-              ? `Subtask "${subtask.subtask_name}" đã quá hạn!`
-              : `Subtask "${subtask.subtask_name}" sắp đến hạn trong 3 ngày.`;
+            subEnd < now
+              ? `Subtask "${subtask.task_name}" đã quá hạn!`
+              : `Subtask "${subtask.task_name}" sắp đến hạn trong 3 ngày.`;
 
           sendNotification(task.userid._id.toString(), {
             taskId: task._id,
             taskName: task.task_name,
-            endDate: subtask.end_date,
+            endDate: subEnd,
             message,
           });
         });
       }
     }
 
-    const message =
-      task.end_date < now
-        ? `Task "${task.task_name}" đã quá hạn!`
-        : `Task "${task.task_name}" sắp đến hạn trong 3 ngày.`;
+    const taskStart = new Date(task.start_date);
+    const taskEnd = task?.extend_date
+      ? new Date(task.extend_date)
+      : new Date(task.end_date);
 
-    sendNotification(task.userid._id.toString(), {
-      taskId: task._id,
-      taskName: task.task_name,
-      endDate: task.end_date,
-      message,
-    });
+    if (
+      (taskEnd < now || (taskEnd >= now && taskEnd <= threeDaysLater)) &&
+      taskStart <= now
+    ) {
+      // Gửi thông báo nếu task quá hạn hoặc sắp đến hạn
+      const message =
+        taskEnd < now
+          ? `Task "${task.task_name}" đã quá hạn!`
+          : `Task "${task.task_name}" sắp đến hạn trong 3 ngày.`;
+
+      sendNotification(task.userid._id.toString(), {
+        taskId: task._id,
+        taskName: task.task_name,
+        endDate: taskEnd,
+        message,
+      });
+    }
   });
 });
 
