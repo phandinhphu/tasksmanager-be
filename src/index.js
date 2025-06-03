@@ -1,11 +1,11 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const cookieParser = require("cookie-parser");
-const morgan = require("morgan");
-const helmet = require("helmet");
-const routes = require("./routes");
-const passport = require("passport");
+const express = require('express')
+const cors = require('cors')
+const dotenv = require('dotenv')
+const cookieParser = require('cookie-parser')
+const morgan = require('morgan')
+const helmet = require('helmet')
+const connectDB = require('./config/db')
+const routes = require('./routes');
 
 require("./config/passport")(passport);
 
@@ -32,4 +32,8 @@ app.use(passport.initialize());
 // Routes init
 app.use("/api", routes);
 
-module.exports = app;
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`)
+    })
+})
