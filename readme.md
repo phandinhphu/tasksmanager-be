@@ -1,95 +1,106 @@
+<div align="center">
+
 # TasksManager-BE
 
-TasksManager-BE là backend quản lý công việc cá nhân, xây dựng với Node.js, Express, MongoDB, Socket.IO và Cloudinary.
+</div>
 
-Sử dụng cùng với [TasksManager-FE](https://github.com/phandinhphu/tasksmanager-fe)
+**TasksManager-BE** is a backend system for managing personal tasks, built with Node.js, Express, MongoDB, Socket.IO, and Cloudinary.
 
-## Tính năng chính
+Use it together with [TasksManager-FE](https://github.com/phandinhphu/tasksmanager-fe)
 
-- Đăng ký, đăng nhập, đăng xuất người dùng (JWT, cookie).
-- Quản lý công việc (task), phân loại theo trạng thái, mức độ ưu tiên.
-- Hỗ trợ subtask cho từng công việc.
-- Quản lý lịch biểu cá nhân (schedule).
-- Cập nhật hồ sơ, thay đổi avatar (tích hợp Cloudinary).
-- Thống kê số lượng công việc, trạng thái, số subtask.
-- Gửi thông báo tự động qua Socket.IO khi task/subtask sắp đến hạn hoặc quá hạn.
-- Bảo mật API với xác thực JWT.
-- Cron job kiểm tra deadline công việc mỗi 15 phút.
+## Key Features
 
-## Cấu trúc thư mục
+* User registration, login, and logout (JWT, cookies).
+* Task management, categorized by status and priority levels.
+* Support for subtasks within each task.
+* Personal schedule management.
+* Profile updates, including avatar change (integrated with Cloudinary).
+* Task statistics: total tasks, status, number of subtasks.
+* Automatic notifications via Socket.IO when tasks/subtasks are approaching or past their deadlines.
+* API security using JWT authentication.
+* Cron job checks for task deadlines every 15 minutes.
+
+## Directory Structure
 
 ```
 ├── src/
 |    ├── apis/
-|    |  ├──  controllers/   // Controllers cho các API
+|    |  ├──  controllers/   // API controllers
 |    |  ├──  models/        // Mongoose models
 |    ├── config/
-|    ├── cloudinary/    // Cấu hình Cloudinary
-|    ├── db/            // Kết nối MongoDB
-|    ├── middleware/      // Middleware xác thực
-|    ├── routes/          // Định tuyến API
-|    ├── services/        // Cron job, dịch vụ nền
-|    ├── sockets/         // Quản lý Socket.IO
-|    ├── util/            // Tiện ích chung
-|    ├── server.js        // Khởi tạo server HTTP & Socket.IO
+|    ├── cloudinary/        // Cloudinary configuration
+|    ├── db/                // MongoDB connection
+|    ├── middleware/        // Authentication middleware
+|    ├── routes/            // API routes
+|    ├── services/          // Cron jobs, background services
+|    ├── sockets/           // Socket.IO management
+|    ├── util/              // Utility functions
+|    ├── server.js          // Initialize HTTP & Socket.IO server
 |    ├── index.js
-├── .env.example               // Biến môi trường
+├── .env.example            // Environment variables
 ```
 
-## Cài đặt
+## Installation
 
-1. **Clone dự án**
+1. **Clone the project**
+
    ```sh
    git clone https://github.com/phandinhphu/tasksmanager-be.git
    cd tasksmanager-be
    ```
 
-2. **Cài đặt dependencies**
+2. **Install dependencies**
+
    ```sh
    npm install
    ```
 
-3. **Cấu hình biến môi trường**
-   - Đổi tên tệp `.env.example` thành `.env` và chỉnh lại các thông tin MongoDB, JWT, Cloudinary sao cho hợp.
+3. **Configure environment variables**
 
-4. **Chạy dự án**
-   - Chạy ở chế độ phát triển:
+   * Rename the `.env.example` file to `.env` and update the MongoDB, JWT, and Cloudinary settings accordingly.
+
+4. **Run the project**
+
+   * For development:
+
      ```sh
      npm run dev
      ```
-   - Hoặc chạy ở chế độ production:
+   * Or for production:
+
      ```sh
      npm start
      ```
 
-## API chính
-|Methods|Endpoint|Description|
-|---|---|---|
-|POST|/api/auth/register|Đăng ký tài khoản|
-|POST|/api/auth/login|Đăng nhập|
-|POST|/api/auth/logout|Đăng xuất|
-|GET|/api/user/me|Lấy thông tin cá nhân|
-|PUT|/api/user/me/update-profile|Cập nhật hồ sơ|
-|GET|/api/tasks/me|Lấy danh sách công việc cá nhân|
-|POST|/api/tasks|Tạo công việc mới|
-|PUT|/api/tasks/:id|Cập nhật công việc|
-|PUT|/api/tasks/:id/complete|Hoàn thành công việc|
-|DELETE|/api/tasks/:id|Xóa công việc|
-|GET|/api/schedules/me|Lấy lịch biểu cá nhân|
-|POST|/api/schedules/create|Tạo lịch biểu mới|
+## Main APIs
 
-## Công nghệ sử dụng
+| Method | Endpoint                    | Description              |
+| ------ | --------------------------- | ------------------------ |
+| POST   | /api/auth/register          | Register a new account   |
+| POST   | /api/auth/login             | Log in                   |
+| POST   | /api/auth/logout            | Log out                  |
+| GET    | /api/user/me                | Get personal information |
+| PUT    | /api/user/me/update-profile | Update profile           |
+| GET    | /api/tasks/me               | Get personal task list   |
+| POST   | /api/tasks                  | Create a new task        |
+| PUT    | /api/tasks/\:id             | Update a task            |
+| PUT    | /api/tasks/\:id/complete    | Mark task as complete    |
+| DELETE | /api/tasks/\:id             | Delete a task            |
+| GET    | /api/schedules/me           | Get personal schedule    |
+| POST   | /api/schedules/create       | Create a new schedule    |
 
-- Node.js, Express.js
-- MongoDB, Mongoose
-- Socket.IO (realtime notification)
-- Cloudinary (lưu trữ ảnh)
-- JWT, cookie-parser, helmet, cors, dotenv
+## Technologies Used
 
-## Đóng góp
+* Node.js, Express.js
+* MongoDB, Mongoose
+* Socket.IO (real-time notifications)
+* Cloudinary (image storage)
+* JWT, cookie-parser, helmet, cors, dotenv
 
-Mọi đóng góp, báo lỗi hoặc ý tưởng mới đều được hoan nghênh qua Issues trên GitHub.
+## Contribution
+
+All contributions, bug reports, or new ideas are welcome via GitHub Issues.
 
 ---
 
-> Tác giả: phandinhphu
+> Author: phandinhphu, prpjzz.
