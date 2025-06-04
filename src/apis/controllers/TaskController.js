@@ -136,7 +136,11 @@ class TaskController {
                 return res.status(404).json({ message: 'Status not found' });
             }
 
-            const updatedTask = await taskSchema.findByIdAndUpdate(taskId, { completed: true, status: completedStatus._id }, { new: true });
+            const updatedTask = await taskSchema.findByIdAndUpdate(taskId, { 
+                completed: true,
+                status: completedStatus._id,
+                completed_date: Date.now()
+            }, { new: true });
 
             if (!updatedTask) {
                 return res.status(404).json({ message: 'Task not found' });
@@ -172,6 +176,7 @@ class TaskController {
 
             subtask.completed = true;
             subtask.status = completedSubtask._id;
+            subtask.completed_date = Date.now();
             await task.save();
 
             return res.status(200).json(task);
