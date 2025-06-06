@@ -16,7 +16,7 @@ const sendVerificationEmail = (to, token) => {
         from: process.env.GMAIL_USER,
         to,
         subject: 'Email Verification',
-        text: `Please verify your email by clicking on the following link: ${process.env.BASE_URL}/auth/verify-email?token=${token}`,
+        text: `Please verify your email by clicking on the following link: ${process.env.BASE_URL}/api/auth/verify-email?token=${token}`,
     };
 
     return transporter.sendMail(mailOptions);

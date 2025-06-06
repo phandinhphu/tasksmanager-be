@@ -19,3 +19,27 @@ connectDB().then(() => {
       console.log(`Server running on port ${PORT}`);
     });
 })
+
+// Xử lý tắt server và đóng kết nối
+const gracefulShutdown = async () => {
+  console.log('\n⏳ Gracefully shutting down...');
+  try {
+    await mongoose.connection.close();
+    console.log('✅ MongoDB connection closed');
+
+    io.close(() => {
+      console.log('🔌 Socket.IO server closed');
+    });
+
+    server.close(() => {
+      console.log('🛑 HTTP server closed');
+      process.exit(0);
+    });
+  } catch (err) {
+    console.error('❌ Error during shutdown:', err);
+    process.exit(1);
+  }
+};
+
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
