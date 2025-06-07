@@ -10,7 +10,6 @@ class ScheduleController {
             const schedules = await scheduleSchema.find({ userid: userId });
             return res.status(200).json(schedules);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
         }
     }
@@ -33,7 +32,6 @@ class ScheduleController {
             await newSchedule.save();
             return res.status(201).json(newSchedule);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
@@ -58,7 +56,6 @@ class ScheduleController {
 
             return res.status(200).json(updatedSchedule);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
@@ -76,7 +73,6 @@ class ScheduleController {
 
             return res.status(200).json({ message: 'Schedule deleted successfully' });
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }

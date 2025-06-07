@@ -47,7 +47,6 @@ class TaskController {
             // Return the tasks
             return res.status(200).json(newTasks);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
         }
     }
@@ -68,7 +67,6 @@ class TaskController {
 
             return res.status(200).json(task);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
@@ -93,7 +91,6 @@ class TaskController {
             await newTask.save();
             return res.status(201).json(newTask);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
@@ -121,7 +118,6 @@ class TaskController {
 
             return res.status(200).json(updatedTask);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
@@ -148,7 +144,6 @@ class TaskController {
 
             return res.status(200).json(updatedTask);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
         }
     }
@@ -181,7 +176,6 @@ class TaskController {
 
             return res.status(200).json(task);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
@@ -210,7 +204,6 @@ class TaskController {
 
             return res.status(200).json({ message: 'Task deleted successfully' });
         } catch (error) {
-            console.error('Error deleting task:', error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
@@ -221,7 +214,6 @@ class TaskController {
             const statuses = await statusSchema.find();
             return res.status(200).json(statuses);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
@@ -232,7 +224,6 @@ class TaskController {
             const priorities = await prioritySchema.find();
             return res.status(200).json(priorities);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
@@ -243,13 +234,27 @@ class TaskController {
             const userId = req.user._id;
             const tasks = await taskSchema.find({ userid: userId }).populate('status');
 
-            const completed = tasks.filter(task => task.completed).length;
-            const inProgress = tasks.filter(task => task.status.name === 'In Progress').length;
-            const overdue = tasks.filter(task => task.status.name === 'Overdue').length;
-            const subtasks = tasks.reduce((sum, task) => sum + (task.subtasks?.length || 0), 0);
+            let completed = tasks.filter(task => task.completed).length;
+            let inProgress = tasks.filter(task => task.status.name === 'In Progress').length;
+            let overdue = tasks.filter(task => task.status.name === 'Overdue').length;
+            let subtasks = tasks.reduce((sum, task) => sum + (task.subtasks?.length || 0), 0);
+
+            tasks.forEach(task => {
+                if (task.subtasks && task.subtasks.length > 0) {
+                    task.subtasks.forEach(subtask => {
+                        if (subtask.completed) {
+                            completed++;
+                        } else if (subtask.status.name === 'In Progress') {
+                            inProgress++;
+                        } else if (subtask.status.name === 'Overdue') {
+                            overdue++;
+                        }
+                    });
+                }
+            });
 
             const stats = {
-                total: tasks.length,
+                total: tasks.length + subtasks,
                 completed: completed,
                 inProgress: inProgress,
                 overdue: overdue,
@@ -258,7 +263,6 @@ class TaskController {
 
             return res.status(200).json(stats);
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }

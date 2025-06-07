@@ -17,7 +17,6 @@ module.exports = async (req, res, next) => {
         req.user = await userSchema.findById(decoded.id).select('-password');
         next(); // Proceed to the next middleware or route handler
     } catch (error) {
-        console.log(error);
         return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
     }
 }

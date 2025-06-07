@@ -140,7 +140,6 @@ class AuthController {
 
             return res.status(200).json({ message: 'Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.' });
         } catch (error) {
-            console.log(error);
             return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
         }
     }
