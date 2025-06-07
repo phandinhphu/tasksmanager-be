@@ -22,8 +22,8 @@ route.get('/google/callback', passport.authenticate("google", { session: false }
     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
     res.cookie('token', token, {
         httpOnly: true,       // Không cho JS truy cập
-        secure: process.env.NODE_ENV === 'production', // HTTPS ở production
-        sameSite: 'Strict',   // Chặn CSRF cơ bản
+        secure: true,          
+        sameSite: 'None',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
     });
     res.redirect(`${process.env.FRONTEND_URL}/`);
@@ -37,8 +37,8 @@ route.get('/facebook/callback', passport.authenticate('facebook', { session: fal
     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
     res.cookie('token', token, {
         httpOnly: true,       // Không cho JS truy cập
-        secure: process.env.NODE_ENV === 'production', // HTTPS ở production
-        sameSite: 'Strict',   // Chặn CSRF cơ bản
+        secure: true,           
+        sameSite: 'None',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
     });
     res.redirect(`${process.env.FRONTEND_URL}/`);
