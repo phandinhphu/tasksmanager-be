@@ -1,11 +1,17 @@
 const { Server } = require("socket.io");
+const dotenv = require("dotenv");
+dotenv.config();
 
 let io;
 const userSockets = new Map();
 
 function init(server) {
   io = new Server(server, {
-    cors: { origin: "*" },
+    cors: {
+      origin: process.env.FRONTEND_URL || "*", // FE url
+      methods: ["GET", "POST"],
+      credentials: true,
+    },
   });
 
   io.on("connection", (socket) => {

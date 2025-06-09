@@ -11,12 +11,14 @@ const taskSchema = new Schema(
     start_date: { type: Date, required: true },
     end_date: { type: Date, required: true },
     completed: { type: Boolean, default: false },
+    complete_date: { type: Date },
     extend_date: { type: Date },
     subtasks: [
       {
         task_name: { type: String, required: true },
         task_description: { type: String, required: true },
         completed: { type: Boolean, default: false },
+        complete_date: { type: Date },
         status: { type: Schema.Types.ObjectId, ref: "Status", required: true },
         priority: {
           type: Schema.Types.ObjectId,
