@@ -186,7 +186,11 @@ class TaskController {
 
       const updatedTask = await taskSchema.findByIdAndUpdate(
         taskId,
-        { completed: true, status: completedStatus._id },
+        {
+          completed: true,
+          status: completedStatus._id,
+          complete_date: Date.now(),
+        },
         { new: true },
       );
 
@@ -228,6 +232,7 @@ class TaskController {
 
       subtask.completed = true;
       subtask.status = completedSubtask._id;
+      subtask.complete_date = Date.now();
       await task.save();
 
       return res.status(200).json(task);

@@ -2,6 +2,8 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 const User = require("../../apis/models/User");
+const dotenv = require("dotenv");
+dotenv.config();
 
 module.exports = (passport) => {
   // GOOGLE STRATEGY
@@ -10,7 +12,7 @@ module.exports = (passport) => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "/api/auth/google/callback",
+        callbackURL: process.env.GOOGLE_CALLBACK_URL,
       },
       async (accessToken, refreshToken, profile, done) => {
         const email = profile.emails[0].value;
@@ -42,7 +44,7 @@ module.exports = (passport) => {
       {
         clientID: process.env.FB_APP_ID,
         clientSecret: process.env.FB_APP_SECRET,
-        callbackURL: "/api/auth/facebook/callback",
+        callbackURL: process.env.FB_CALLBACK_URL,
         profileFields: ["id", "emails", "name", "displayName"],
       },
       async (accessToken, refreshToken, profile, done) => {
