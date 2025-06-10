@@ -2,6 +2,7 @@ const http = require("http");
 const app = require("./index");
 const dotenv = require('dotenv')
 const socketManager = require("./sockets/socketManager");
+const mongoose = require('mongoose');
 const connectDB = require('./config/db')
 
 // cron job
@@ -11,6 +12,7 @@ dotenv.config();
 
 const server = http.createServer(app);
 socketManager.init(server); // Khởi tạo socket
+const io = socketManager.getIO(); // Lấy instance của Socket.IO
 
 const PORT = process.env.PORT || 3000;
 

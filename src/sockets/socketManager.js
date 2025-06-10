@@ -39,4 +39,8 @@ function sendNotification(userId, payload) {
     }
 }
 
-module.exports = { init, sendNotification };
+function getIO() {
+    return io;
+}
+
+module.exports = { init, sendNotification, getIO };
