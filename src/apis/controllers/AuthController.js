@@ -1,9 +1,12 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-const crypto = require('crypto');
-const userSchema = require('../models/User');
-const { sendVerificationEmail, sendResetPasswordEmail } = require('../../util/sendEmail');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+const crypto = require("crypto");
+const userSchema = require("../models/User");
+const {
+    sendVerificationEmail,
+    sendResetPasswordEmail,
+} = require("../../util/sendEmail");
 
 dotenv.config();
 
@@ -16,13 +19,15 @@ class AuthController {
             // Check if user already exists
             const existingUser = await userSchema.findOne({ email });
             if (existingUser) {
-                return res.status(400).json({ message: 'Email already exists' });
+                return res
+                    .status(400)
+                    .json({ message: "Email already exists" });
             }
 
             // Hash the password
             const hashedPassword = await bcrypt.hash(password, 10);
             // Generate verification token
-            const verifyToken = crypto.randomBytes(32).toString('hex');
+            const verifyToken = crypto.randomBytes(32).toString("hex");
 
             // Create a new user
             const newUser = new userSchema({
@@ -36,64 +41,91 @@ class AuthController {
             await sendVerificationEmail(email, verifyToken);
 
             await newUser.save();
-            return res.status(201).json({ message: 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn.' });
+            return res
+                .status(201)
+                .json({
+                    message:
+                        "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
+                });
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res
+                .status(500)
+                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
         }
     }
 
     // [POST] /auth/login
     async login(req, res, next) {
         const { email, password } = req.body;
-        
+
         try {
             // Check if user exists
             const user = await userSchema.findOne({ email });
             if (!user) {
-                return res.status(400).json({ message: 'Email hoặc mật khẩu không hợp lệ' });
+                return res
+                    .status(400)
+                    .json({ message: "Email hoặc mật khẩu không hợp lệ" });
             }
 
             // Check password
-            const isPasswordValid = await bcrypt.compare(password, user.password);
+            const isPasswordValid = await bcrypt.compare(
+                password,
+                user.password
+            );
             if (!isPasswordValid) {
-                return res.status(400).json({ message: 'Email hoặc mật khẩu không hợp lệ' });
+                return res
+                    .status(400)
+                    .json({ message: "Email hoặc mật khẩu không hợp lệ" });
             }
 
             // Check if user is verified
             if (!user.verified) {
-                return res.status(400).json({ message: 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản của bạn.' });
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            "Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
+                    });
             }
-            
-            // Generate JWT token
-            const token = jwt.sign({ 
-                id: user._id
-            }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
-            res.cookie('token', token,  {
-                httpOnly: true,       // Không cho JS truy cập
-                secure: true,             // bắt buộc khi sameSite: 'None'
-                sameSite: 'None',
+            // Generate JWT token
+            const token = jwt.sign(
+                {
+                    id: user._id,
+                },
+                process.env.JWT_SECRET,
+                { expiresIn: process.env.JWT_EXPIRES_IN }
+            );
+
+            res.cookie("token", token, {
+                httpOnly: true, // Không cho JS truy cập
+                secure: true, // bắt buộc khi sameSite: 'None'
+                sameSite: "None",
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
             });
 
-            res.json({ message: 'Đăng nhập thành công' });
+            res.json({ message: "Đăng nhập thành công" });
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res
+                .status(500)
+                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
         }
     }
 
     // [POST] /auth/logout
     async logout(req, res, next) {
         try {
-            res.clearCookie('token', {
+            res.clearCookie("token", {
                 httpOnly: true,
                 secure: true,
                 sameSite: "None",
                 path: "/",
             });
-            return res.status(200).json({ message: 'Đăng xuất thành công' });
+            return res.status(200).json({ message: "Đăng xuất thành công" });
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res
+                .status(500)
+                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
         }
     }
 
@@ -105,7 +137,9 @@ class AuthController {
             // Find user by verification token
             const user = await userSchema.findOne({ verifyToken: token });
             if (!user) {
-                return res.status(400).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
+                return res
+                    .status(400)
+                    .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
             }
 
             // Update user to verified
@@ -127,20 +161,27 @@ class AuthController {
             // Find user by email
             const user = await userSchema.findOne({ email });
             if (!user) {
-                return res.status(400).json({ message: 'Email không tồn tại' });
+                return res.status(400).json({ message: "Email không tồn tại" });
             }
 
             // Generate reset token
-            const resetToken = crypto.randomBytes(32).toString('hex');
+            const resetToken = crypto.randomBytes(32).toString("hex");
             user.forgotPasswordToken = resetToken;
             await user.save();
 
             // Send reset password email
             await sendResetPasswordEmail(email, resetToken);
 
-            return res.status(200).json({ message: 'Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.' });
+            return res
+                .status(200)
+                .json({
+                    message:
+                        "Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.",
+                });
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res
+                .status(500)
+                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
         }
     }
 
@@ -150,22 +191,33 @@ class AuthController {
 
         try {
             // Find user by reset token
-            const user = await userSchema.findOne({ forgotPasswordToken: token });
+            const user = await userSchema.findOne({
+                forgotPasswordToken: token,
+            });
             if (!user) {
-                return res.status(400).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
+                return res
+                    .status(400)
+                    .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
             }
 
             // Hash the new password
             const hashedPassword = await bcrypt.hash(newPassword, 10);
             // Update user's password and clear reset token
             user.password = hashedPassword;
-            user.resetToken = null;
+            user.forgotPasswordToken = null;
 
             await user.save();
 
-            return res.status(200).json({ message: 'Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập với mật khẩu mới.' });
+            return res
+                .status(200)
+                .json({
+                    message:
+                        "Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập với mật khẩu mới.",
+                });
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res
+                .status(500)
+                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
         }
     }
 }
