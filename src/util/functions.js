@@ -1,8 +1,5 @@
-const cron = require("node-cron");
 const Task = require("../apis/models/Task");
 const LogEmail = require("../apis/models/LogEmail");
-const { sendNotification } = require("./../sockets/socketManager");
-const { sendEmail } = require("../util/sendEmail");
 
 // Hàm: Lấy các task và subtask quá hạn hoặc sắp đến hạn trong 3 ngày
 async function getTasksDueSoon() {
@@ -101,57 +98,7 @@ async function checkEmailBeforeSend(payload) {
     return true; // Cho phép gửi email
 }
 
-// Gửi thông báo qua socket cho người dùng về các task và subtask quá hạn hoặc sắp đến hạn
-cron.schedule("*/15 * * * *", async () => {
-    const userTasksMap = await getTasksDueSoon();
-
-    Object.keys(userTasksMap).forEach(async (userId) => {
-        const userTasks = userTasksMap[userId];
-
-        // Gửi thông báo qua socket
-        userTasks.notifications.forEach((n) => {
-            sendNotification(userId, {
-                taskId: n.taskId,
-                taskName: n.taskName,
-                endDate: n.endDate,
-                message: n.message,
-            });
-        });
-    });
-});
-
-// Gửi email cho người dùng về các task và subtask quá hạn hoặc sắp đến hạn
-cron.schedule("0 8,13,18 * * *", async () => {
-    const userTasksMap = await getTasksDueSoon();
-
-    Object.values(userTasksMap).forEach(async (userTasks) => {
-        if (userTasks.emails.length > 0) {
-            const emailContent = `
-                Xin chào ${userTasks.name},
-
-                Bạn có các công việc sau cần chú ý:
-                ${userTasks.emails
-                    .map((msg, i) => `${i + 1}. ${msg}`)
-                    .join("\n")}
-
-                Vui lòng đăng nhập hệ thống để xem chi tiết.
-            `;
-
-            const isSend = await checkEmailBeforeSend({
-                to: userTasks.email,
-                subject: "Thông báo công việc của bạn",
-                text: emailContent,
-            });
-
-            if (isSend) {
-                await sendEmail({
-                    to: userTasks.email,
-                    subject: "Thông báo công việc của bạn",
-                    text: emailContent,
-                });
-            }
-        }
-    });
-});
-
-module.exports = {}; // để import chạy cron
+module.exports = {
+    getTasksDueSoon,
+    checkEmailBeforeSend,
+};

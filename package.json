@@ -23,6 +23,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "start:worker": "node src/worker.js",
     "dev": "nodemon --inspect src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
