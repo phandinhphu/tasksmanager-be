@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 
 // cron job
-require("./services/taskReminderNotifyJob");
+require("./services/job");
 
 dotenv.config();
 
