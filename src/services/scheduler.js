@@ -1,6 +1,6 @@
 const cron = require("node-cron");
 const Task = require("../apis/models/Task");
-const Status = require("../apis/models/Status");
+const LogEmail = require("../apis/models/LogEmail");
 const { sendNotification } = require("./../sockets/socketManager");
 const { sendEmail } = require("../util/sendEmail");
 
@@ -137,21 +137,19 @@ cron.schedule("0 8,13,18 * * *", async () => {
                 Vui lòng đăng nhập hệ thống để xem chi tiết.
             `;
 
-            if (
-                !(await checkEmailBeforeSend({
-                    to: userTasks.email,
-                    subject: "Thông báo công việc của bạn",
-                    text: emailContent,
-                }))
-            ) {
-                return; // Không gửi lại email
-            }
-
-            await sendEmail({
+            const isSend = await checkEmailBeforeSend({
                 to: userTasks.email,
                 subject: "Thông báo công việc của bạn",
                 text: emailContent,
             });
+
+            if (isSend) {
+                await sendEmail({
+                    to: userTasks.email,
+                    subject: "Thông báo công việc của bạn",
+                    text: emailContent,
+                });
+            }
         }
     });
 });
