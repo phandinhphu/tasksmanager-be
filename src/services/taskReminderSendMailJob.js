@@ -8,6 +8,7 @@ cron.schedule("0 8,13,18 * * *", async () => {
 
     Object.values(userTasksMap).forEach(async (userTasks) => {
         if (userTasks.emails.length > 0) {
+            const subject = `Thông báo công việc của bạn - ${new Date().toLocaleDateString()}`;
             const emailContent = `
                 Xin chào ${userTasks.name},
 
@@ -21,16 +22,12 @@ cron.schedule("0 8,13,18 * * *", async () => {
 
             const isSend = await checkEmailBeforeSend({
                 to: userTasks.email,
-                subject: "Thông báo công việc của bạn",
+                subject: subject,
                 text: emailContent,
             });
 
             if (isSend) {
-                await sendEmail({
-                    to: userTasks.email,
-                    subject: "Thông báo công việc của bạn",
-                    text: emailContent,
-                });
+                await sendEmail(userTasks.email, subject, emailContent);
             }
         }
     });
