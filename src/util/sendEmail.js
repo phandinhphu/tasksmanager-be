@@ -17,7 +17,7 @@ const sendEmail = (to, subject, text) => {
         from: process.env.GMAIL_USER,
         to,
         subject,
-        text,
+        html: text,
     };
 
     try {
