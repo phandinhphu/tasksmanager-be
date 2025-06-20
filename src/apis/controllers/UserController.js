@@ -89,7 +89,7 @@ class UserController {
             }
 
             // Delete tasks associated with the user
-            await taskSchema.deleteMany({ userId });
+            await taskSchema.deleteMany({ userid: userId });
 
             // Delete the user account
             await userSchema.findByIdAndDelete(userId);
