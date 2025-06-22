@@ -120,6 +120,7 @@ class UserController {
         const emailAdmin =
             process.env.EMAIL_ADMIN || "phuphandinh2004@gmail.com";
         const name = req.user.name;
+        const email = req.user.email;
 
         try {
             const verifyRes = await axios.post(
@@ -141,7 +142,11 @@ class UserController {
                     .json({ message: "Xác thực reCAPTCHA không thành công" });
             }
 
-            await sendEmail(emailAdmin, "Feedback from " + name, feedback);
+            await sendEmail(
+                emailAdmin,
+                `Feedback from ${name} (${email})`,
+                feedback
+            );
             return res
                 .status(200)
                 .json({ message: "Feedback sent successfully" });

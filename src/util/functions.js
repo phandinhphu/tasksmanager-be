@@ -1,4 +1,5 @@
 const Task = require("../apis/models/Task");
+const User = require("../apis/models/User");
 const LogEmail = require("../apis/models/LogEmail");
 
 // Hàm: Lấy các task và subtask quá hạn hoặc sắp đến hạn trong 3 ngày
@@ -98,7 +99,31 @@ async function checkEmailBeforeSend(payload) {
     return true; // Cho phép gửi email
 }
 
+// Hàm: Dọn dẹp các tài khoản chưa xác thực sau 24h
+async function cleanupUnverifiedAccounts() {
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now);
+    twentyFourHoursAgo.setHours(now.getHours() - 24);
+
+    // Tìm các tài khoản chưa xác thực và đã tạo hơn 24 giờ
+    const unverifiedUsers = await User.find({
+        verified: false,
+        createdAt: { $lt: twentyFourHoursAgo },
+    });
+
+    if (unverifiedUsers.length > 0) {
+        // Xử lý dọn dẹp tài khoản chưa xác thực
+        await User.deleteMany({
+            _id: { $in: unverifiedUsers.map((u) => u._id) },
+        });
+        return unverifiedUsers;
+    }
+
+    return [];
+}
+
 module.exports = {
     getTasksDueSoon,
     checkEmailBeforeSend,
+    cleanupUnverifiedAccounts,
 };
