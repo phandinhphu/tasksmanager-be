@@ -2,3 +2,4 @@
 
 require("./taskReminderSendMailJob");
 require("./taskReminderNotifyJob");
+require("./cleanupUnverifiedAccountsDailyJob");
