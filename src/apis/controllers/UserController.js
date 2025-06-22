@@ -1,7 +1,9 @@
 const bcrypt = require("bcryptjs");
+const axios = require("axios");
 const userSchema = require("../models/User");
 const taskSchema = require("../models/Task");
 const cloudinary = require("../../config/cloudinary");
+const { sendEmail } = require("../../util/sendEmail");
 
 class UserController {
     // [GET] /user/me
@@ -105,6 +107,44 @@ class UserController {
             return res
                 .status(200)
                 .json({ message: "Account deleted successfully" });
+        } catch (error) {
+            return res
+                .status(500)
+                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        }
+    }
+
+    // [POST] user/me/feedback
+    async sendFeedback(req, res, next) {
+        const { feedback, captchaToken } = req.body;
+        const emailAdmin =
+            process.env.EMAIL_ADMIN || "phuphandinh2004@gmail.com";
+        const name = req.user.name;
+
+        try {
+            const verifyRes = await axios.post(
+                "https://www.google.com/recaptcha/api/siteverify",
+                null,
+                {
+                    params: {
+                        secret: process.env.RECAPTCHA_SECRET_KEY,
+                        response: captchaToken,
+                    },
+                }
+            );
+
+            const { success, score } = verifyRes.data;
+
+            if (!success || score < 0.5) {
+                return res
+                    .status(400)
+                    .json({ message: "Xác thực reCAPTCHA không thành công" });
+            }
+
+            await sendEmail(emailAdmin, "Feedback from " + name, feedback);
+            return res
+                .status(200)
+                .json({ message: "Feedback sent successfully" });
         } catch (error) {
             return res
                 .status(500)
