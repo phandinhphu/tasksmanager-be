@@ -90,8 +90,8 @@ class AuthController {
 
       res.cookie("token", token, {
         httpOnly: true, // Không cho JS truy cập
-        secure: true, // HTTPS ở production
-        sameSite: "None", // Chặn CSRF cơ bản
+        secure: true, // bắt buộc khi sameSite: 'None'
+        sameSite: "None",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
       });
 
@@ -107,10 +107,10 @@ class AuthController {
   async logout(req, res, next) {
     try {
       res.clearCookie("token", {
-        httpOnly: true, // Không cho JS truy cập
-        secure: true, // when sameSite is none, secure must be true
+        httpOnly: true,
+        secure: true,
         sameSite: "None",
-        path: "/", // 7 ngày
+        path: "/",
       });
       return res.status(200).json({ message: "Đăng xuất thành công" });
     } catch (error) {
@@ -167,7 +167,6 @@ class AuthController {
         message: "Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.",
       });
     } catch (error) {
-      console.log(error);
       return res
         .status(500)
         .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
@@ -180,7 +179,9 @@ class AuthController {
 
     try {
       // Find user by reset token
-      const user = await userSchema.findOne({ forgotPasswordToken: token });
+      const user = await userSchema.findOne({
+        forgotPasswordToken: token,
+      });
       if (!user) {
         return res
           .status(400)

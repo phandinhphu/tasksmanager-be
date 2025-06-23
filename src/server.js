@@ -6,11 +6,12 @@ const connectDB = require("./config/db");
 const { default: mongoose } = require("mongoose");
 
 // cron job
-require("./services/scheduler");
+require("./services/job");
 
 dotenv.config();
 
 const server = http.createServer(app);
+const io = socketManager.getIO();
 socketManager.init(server); // Khởi tạo socket
 
 const PORT = process.env.PORT || 3000;
