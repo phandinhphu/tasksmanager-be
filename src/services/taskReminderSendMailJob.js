@@ -1,9 +1,7 @@
-const dotenv = require("dotenv");
 const cron = require("node-cron");
 const { sendEmail } = require("../util/sendEmail");
 const { getTasksDueSoon, checkEmailBeforeSend } = require("../util/functions");
-
-dotenv.config();
+const { FRONTEND_URL } = require("../util/constants");
 
 // Gửi email cho người dùng về các task và subtask quá hạn hoặc sắp đến hạn
 cron.schedule(
@@ -26,9 +24,7 @@ cron.schedule(
                             .join("\n")}
                     </ul>
 
-                    <p>Vui lòng <a href="${
-                        process.env.FRONTEND_URL
-                    }" style="color: #1a73e8; text-decoration: none;">đăng nhập hệ thống</a> để xem chi tiết.</p>
+                    <p>Vui lòng <a href="${FRONTEND_URL}" style="color: #1a73e8; text-decoration: none;">đăng nhập hệ thống</a> để xem chi tiết.</p>
 
                     <p style="margin-top: 20px;">Trân trọng,<br/>
                     <strong>Hệ thống Quản lý Công việc</strong></p>

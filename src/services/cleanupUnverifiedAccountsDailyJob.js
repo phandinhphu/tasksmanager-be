@@ -1,6 +1,7 @@
 const cron = require("node-cron");
 const { sendEmail } = require("../util/sendEmail");
 const { cleanupUnverifiedAccounts } = require("../util/functions");
+const { EMAIL_ADMIN } = require("../util/constants");
 
 // Dọn dẹp tài khoản chưa xác thực sau 24h
 cron.schedule(
@@ -30,7 +31,7 @@ cron.schedule(
                         <strong>Hệ thống Quản lý Công việc và lịch học cá nhân</strong></p>
                     </div>
                 `;
-                await sendEmail(process.env.ADMIN_EMAIL, subject, emailContent);
+                await sendEmail(EMAIL_ADMIN, subject, emailContent);
             }
         } catch (error) {
             console.error(

@@ -1,20 +1,23 @@
-const dotenv = require("dotenv");
 const nodeMailer = require("nodemailer");
 const LogEmail = require("../apis/models/LogEmail");
-
-dotenv.config();
+const {
+    GMAIL_USER,
+    GMAIL_PASS,
+    BASE_URL,
+    FRONTEND_URL,
+} = require("../util/constants");
 
 const transporter = nodeMailer.createTransport({
     service: "gmail",
     auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
+        user: GMAIL_USER,
+        pass: GMAIL_PASS,
     },
 });
 
 const sendEmail = (to, subject, text) => {
     const mailOptions = {
-        from: process.env.GMAIL_USER,
+        from: GMAIL_USER,
         to,
         subject,
         html: text,
@@ -52,10 +55,10 @@ const sendEmail = (to, subject, text) => {
 
 const sendVerificationEmail = (to, token) => {
     const mailOptions = {
-        from: process.env.GMAIL_USER,
+        from: GMAIL_USER,
         to,
         subject: "Email Verification",
-        text: `Please verify your email by clicking on the following link: ${process.env.BASE_URL}/api/auth/verify-email?token=${token}`,
+        text: `Please verify your email by clicking on the following link: ${BASE_URL}/api/auth/verify-email?token=${token}`,
     };
 
     try {
@@ -90,10 +93,10 @@ const sendVerificationEmail = (to, token) => {
 
 const sendResetPasswordEmail = (to, token) => {
     const mailOptions = {
-        from: process.env.GMAIL_USER,
+        from: GMAIL_USER,
         to,
         subject: "Reset Password",
-        text: `You can reset your password by clicking on the following link: ${process.env.FRONTEND_URL}/reset-password?token=${token}`,
+        text: `You can reset your password by clicking on the following link: ${FRONTEND_URL}/reset-password?token=${token}`,
     };
 
     try {

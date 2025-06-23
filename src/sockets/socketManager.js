@@ -1,7 +1,5 @@
 const { Server } = require("socket.io");
-const dotenv = require('dotenv');
-
-dotenv.config();
+const { FRONTEND_URL } = require("../util/constants");
 
 let io;
 const userSockets = new Map();
@@ -9,16 +7,18 @@ const userSockets = new Map();
 function init(server) {
     io = new Server(server, {
         cors: {
-            origin: process.env.FRONTEND_URL || '*', // frontend URL
-            methods: ['GET', 'POST'],
-            credentials: true
-        }
+            origin: FRONTEND_URL || "*", // frontend URL
+            methods: ["GET", "POST"],
+            credentials: true,
+        },
     });
 
     io.on("connection", (socket) => {
         socket.on("register", (userId) => {
             userSockets.set(userId, socket.id);
-            console.log(`User ${userId} connected with socket ID: ${socket.id}`);
+            console.log(
+                `User ${userId} connected with socket ID: ${socket.id}`
+            );
         });
 
         socket.on("disconnect", () => {

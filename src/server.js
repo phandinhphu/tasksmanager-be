@@ -1,24 +1,22 @@
 const http = require("http");
 const app = require("./index");
-const dotenv = require("dotenv");
 const socketManager = require("./sockets/socketManager");
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
+const { PORT } = require("./util/constants");
 
 // cron job
 require("./services/job");
-
-dotenv.config();
 
 const server = http.createServer(app);
 socketManager.init(server); // Khởi tạo socket
 const io = socketManager.getIO(); // Lấy instance của Socket.IO
 
-const PORT = process.env.PORT || 3000;
+const _PORT = PORT || 3000;
 
 connectDB().then(() => {
-    server.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+    server.listen(_PORT, () => {
+        console.log(`Server running on port ${_PORT}`);
     });
 });
 

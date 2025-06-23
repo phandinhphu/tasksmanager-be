@@ -1,18 +1,12 @@
-const mongoose = require("mongoose")
-const dotenv = require("dotenv")
-
-dotenv.config()
-
-if (!process.env.MONGODB_URI) {
-    throw new Error("MONGODB_URI is not set")
-}
+const mongoose = require("mongoose");
+const { MONGODB_URI } = require("../../util/constants");
 
 async function connectDB() {
     try {
-        await mongoose.connect(process.env.MONGODB_URI)
+        await mongoose.connect(MONGODB_URI);
     } catch (error) {
-        process.exit(1)
+        process.exit(1);
     }
 }
 
-module.exports = connectDB
+module.exports = connectDB;

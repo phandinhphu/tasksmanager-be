@@ -4,6 +4,7 @@ const userSchema = require("../models/User");
 const taskSchema = require("../models/Task");
 const cloudinary = require("../../config/cloudinary");
 const { sendEmail } = require("../../util/sendEmail");
+const { EMAIL_ADMIN, RECAPTCHA_SECRET_KEY } = require("../../util/constants");
 
 class UserController {
     // [GET] /user/me
@@ -117,8 +118,7 @@ class UserController {
     // [POST] user/me/feedback
     async sendFeedback(req, res, next) {
         const { feedback, captchaToken } = req.body;
-        const emailAdmin =
-            process.env.EMAIL_ADMIN || "phuphandinh2004@gmail.com";
+        const emailAdmin = EMAIL_ADMIN || "phuphandinh2004@gmail.com";
         const name = req.user.name;
         const email = req.user.email;
 
@@ -128,7 +128,7 @@ class UserController {
                 null,
                 {
                     params: {
-                        secret: process.env.RECAPTCHA_SECRET_KEY,
+                        secret: RECAPTCHA_SECRET_KEY,
                         response: captchaToken,
                     },
                 }

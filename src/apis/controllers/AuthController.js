@@ -1,14 +1,16 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
 const crypto = require("crypto");
 const userSchema = require("../models/User");
 const {
     sendVerificationEmail,
     sendResetPasswordEmail,
 } = require("../../util/sendEmail");
-
-dotenv.config();
+const {
+    JWT_SECRET,
+    JWT_EXPIRES_IN,
+    FRONTEND_URL,
+} = require("../../util/constants");
 
 class AuthController {
     // [POST] /auth/register
@@ -41,12 +43,10 @@ class AuthController {
             await sendVerificationEmail(email, verifyToken);
 
             await newUser.save();
-            return res
-                .status(201)
-                .json({
-                    message:
-                        "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
-                });
+            return res.status(201).json({
+                message:
+                    "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
+            });
         } catch (error) {
             return res
                 .status(500)
@@ -80,12 +80,10 @@ class AuthController {
 
             // Check if user is verified
             if (!user.verified) {
-                return res
-                    .status(400)
-                    .json({
-                        message:
-                            "Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
-                    });
+                return res.status(400).json({
+                    message:
+                        "Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
+                });
             }
 
             // Generate JWT token
@@ -93,8 +91,8 @@ class AuthController {
                 {
                     id: user._id,
                 },
-                process.env.JWT_SECRET,
-                { expiresIn: process.env.JWT_EXPIRES_IN }
+                JWT_SECRET,
+                { expiresIn: JWT_EXPIRES_IN }
             );
 
             res.cookie("token", token, {
@@ -147,9 +145,9 @@ class AuthController {
             user.verifyToken = null; // Clear the verification token
             await user.save();
 
-            return res.redirect(`${process.env.FRONTEND_URL}/verify-success`);
+            return res.redirect(`${FRONTEND_URL}/verify-success`);
         } catch (error) {
-            return res.redirect(`${process.env.FRONTEND_URL}/verify-fail`);
+            return res.redirect(`${FRONTEND_URL}/verify-fail`);
         }
     }
 
@@ -172,12 +170,9 @@ class AuthController {
             // Send reset password email
             await sendResetPasswordEmail(email, resetToken);
 
-            return res
-                .status(200)
-                .json({
-                    message:
-                        "Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.",
-                });
+            return res.status(200).json({
+                message: "Vui lòng kiểm tra email để đặt lại mật khẩu của bạn.",
+            });
         } catch (error) {
             return res
                 .status(500)
@@ -208,12 +203,10 @@ class AuthController {
 
             await user.save();
 
-            return res
-                .status(200)
-                .json({
-                    message:
-                        "Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập với mật khẩu mới.",
-                });
+            return res.status(200).json({
+                message:
+                    "Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập với mật khẩu mới.",
+            });
         } catch (error) {
             return res
                 .status(500)
