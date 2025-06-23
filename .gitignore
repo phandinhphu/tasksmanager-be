@@ -12,7 +12,8 @@ node_modules
 dist
 dist-ssr
 *.local
-
+# when test in local, not push to global
+.env
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
