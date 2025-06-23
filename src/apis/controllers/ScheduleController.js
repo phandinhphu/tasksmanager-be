@@ -6,11 +6,10 @@ class ScheduleController {
   // [GET] /schedules/me
   async getMySchedules(req, res) {
     try {
-      const userId = req.user._id; // Assuming you have user ID in req.user
+      const userId = req.user._id;
       const schedules = await scheduleSchema.find({ userid: userId });
       return res.status(200).json(schedules);
     } catch (error) {
-      console.log(error);
       return res
         .status(500)
         .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!", error });
@@ -21,7 +20,7 @@ class ScheduleController {
   async createSchedule(req, res) {
     try {
       const { title, days, startTime, endTime, repeat } = req.body;
-      const userId = req.user.id; // Assuming you have user ID in req.user
+      const userId = req.user._id;
 
       const newSchedule = new scheduleSchema({
         title,
@@ -35,10 +34,9 @@ class ScheduleController {
       await newSchedule.save();
       return res.status(201).json(newSchedule);
     } catch (error) {
-      console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!", error });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -66,10 +64,9 @@ class ScheduleController {
 
       return res.status(200).json(updatedSchedule);
     } catch (error) {
-      console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!", error });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 
@@ -87,10 +84,9 @@ class ScheduleController {
 
       return res.status(200).json({ message: "Schedule deleted successfully" });
     } catch (error) {
-      console.log(error);
       return res
         .status(500)
-        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!", error });
+        .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
     }
   }
 }

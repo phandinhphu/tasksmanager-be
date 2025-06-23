@@ -1,5 +1,6 @@
 const { Server } = require("socket.io");
 const dotenv = require("dotenv");
+
 dotenv.config();
 
 let io;
@@ -8,7 +9,7 @@ const userSockets = new Map();
 function init(server) {
   io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || "*", // FE url
+      origin: process.env.FRONTEND_URL || "*", // frontend URL
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -38,4 +39,8 @@ function sendNotification(userId, payload) {
   }
 }
 
-module.exports = { init, sendNotification };
+function getIO() {
+  return io;
+}
+
+module.exports = { init, sendNotification, getIO };
