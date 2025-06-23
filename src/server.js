@@ -6,7 +6,7 @@ const connectDB = require("./config/db");
 const { default: mongoose } = require("mongoose");
 
 // cron job
-require("./services/job");
+require("./services/jobManager");
 
 dotenv.config();
 
