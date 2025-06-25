@@ -45,7 +45,7 @@ class AuthController {
             await newUser.save();
             return res.status(201).json({
                 message:
-                    "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn.",
+                    "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản của bạn nếu không tài khoản sẽ tự động bị xóa sau 24 giờ.",
             });
         } catch (error) {
             return res
