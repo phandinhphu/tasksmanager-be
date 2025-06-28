@@ -88,7 +88,7 @@ async function getUpcomingTasks() {
     const threeDaysLater = new Date(now);
     threeDaysLater.setDate(now.getDate() + 3);
 
-    const statusTodo = await Status.findOne({ name: "To do" });
+    const statusTodo = await Status.findOne({ name: "To Do" });
 
     // Lấy tất cả các task chưa hoàn thành, chưa bắt đầu và có ngày bắt đầu trong 3 ngày tới
     const tasks = await Task.find({
