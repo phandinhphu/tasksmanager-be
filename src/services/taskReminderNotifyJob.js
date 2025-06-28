@@ -1,12 +1,18 @@
 const cron = require("node-cron");
 const { sendNotification } = require("../sockets/socketManager");
-const { getTasksDueSoon } = require("../util/functions");
+const { getTasksDueSoon, getUpcomingTasks } = require("../util/functions");
 
 // Gửi thông báo qua socket cho người dùng về các task và subtask quá hạn hoặc sắp đến hạn
 cron.schedule(
     "*/15 * * * *",
     async () => {
-        const userTasksMap = await getTasksDueSoon();
+        const tasksDueSoon = await getTasksDueSoon();
+        const upcomingTasks = await getUpcomingTasks();
+
+        const userTasksMap = {
+            ...tasksDueSoon,
+            ...upcomingTasks,
+        };
 
         for (const userId of Object.keys(userTasksMap)) {
             const userTasks = userTasksMap[userId];
