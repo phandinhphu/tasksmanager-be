@@ -155,6 +155,36 @@ npm start
 
 ---
 
+## 🔌 API Documentation
+
+| Method | Endpoint                    | Description                |
+| ------ | --------------------------- | -------------------------------|
+| **POST**   | /api/auth/register          | Đăng kí tài khoản mới      |
+| **POST**   | /api/auth/login             | Đăng nhập                  |
+| **POST**   | /api/auth/logout            | Đăng xuất                  |
+| **POST**   | /api/auth/forgot-password   | Yêu cầu lấy lại mật khẩu   |
+| **POST**   | /api/auth/reset-password    | Đặt lại mật khẩu           |
+| **GET**    | /api/auth/verify-email      | Xác thực Email             |
+| **GET**    | /api/user/me                | Lấy thông tin cá nhân      |
+| **POST**   | /api/user/me/update-profile | Cập nhật thông tin cá nhân |
+| **DELETE** | /api/user/me/delete-account | Xóa tài khoản              |
+| **POST**   | /api/user/me/feedback       | Nhận xét                   |
+| **GET**    | /api/tasks/me               | Lấy danh sách công việc cá nhân|
+| **GET**    | /api/tasks/status           | Lấy tình trạng công việc|
+| **GET**    | /api/tasks/priority         | Lấy độ ưu tiên của của công việc|
+| **GET**    | /api/tasks/stats            | Lấy thông số của công việc|
+| **POST**   | /api/tasks                  | Tạo công việc mới          |
+| **PUT**    | /api/tasks/:id              | Cập nhật công việc         |
+| **PUT**    | /api/tasks/\:id/complete    | Đánh dấu là công việc đã hoàn thành|
+| **PUT**    | /api/tasks/:id              | Cập nhật công việc         |
+| **PUT**    | /api/tasks/:id/subtasks/:subtaskId/complete| Đánh dấu là đã hoàn thành task con|
+| **DELETE** | /api/tasks/:id              | Xóa một công việc          |
+| **GET**    | /api/schedules/me           | Lấy lịch công việc của bản thân      |
+| **POST**   | /api/schedules/create       | Tạo lịch mới      |
+| **PUT**    | /api/schedules/:id          | Cập nhật lịch công việc      |
+| **DELETE** | /api/schedules/:id          | Xóa lịch công việc     |
+
+---
 ## 👥 Đội ngũ phát triển
 
 <table>
@@ -168,7 +198,7 @@ npm start
       <sub>Frontend Developer</sub>
     </td>
     <td align="center">
-      <a href="https://github.com/nguyenhuuphuoc">
+      <a href="https://github.com/prpjzz">
         <img src="https://avatars.githubusercontent.com/u/89702898?v=4" width="100px;"/>
         <br /><b>prpjzz (Nguyen Huu Phuoc)</b>
       </a>
