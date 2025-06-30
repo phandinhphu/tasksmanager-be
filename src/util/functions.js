@@ -3,6 +3,12 @@ const Status = require("../apis/models/Status");
 const User = require("../apis/models/User");
 const LogEmail = require("../apis/models/LogEmail");
 
+// Hàm: Tính số ngày giữa hai ngày
+function getDaysBetween(fromDate, toDate) {
+    const diffTime = toDate.getTime() - fromDate.getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+}
+
 // Hàm: Lấy các task và subtask quá hạn hoặc sắp đến hạn trong 3 ngày
 async function getTasksDueSoon() {
     const now = new Date();
@@ -103,7 +109,14 @@ async function getUpcomingTasks() {
     tasks.forEach((task) => {
         let taskMessages = [];
 
-        const message = `Task "${task.task_name}" sẽ bắt đầu trong 3 ngày tới.`;
+        const taskStart = new Date(task.start_date);
+        const daysUntilStart = getDaysBetween(now, taskStart);
+
+        const message =
+            daysUntilStart === 0
+                ? `Task "${task.task_name}" sẽ bắt đầu ngay hôm nay.`
+                : `Task "${task.task_name}" sẽ bắt đầu trong ${daysUntilStart} ngày tới.`;
+
         taskMessages.push(message);
 
         if (task.subtasks && task.subtasks.length > 0) {
@@ -111,7 +124,12 @@ async function getUpcomingTasks() {
                 const subStart = new Date(subtask.start_date);
 
                 if (subStart >= now && subStart <= threeDaysLater) {
-                    const message = `Subtask "${subtask.task_name}" sẽ bắt đầu trong 3 ngày tới.`;
+                    const daysUntilSubStart = getDaysBetween(now, subStart);
+
+                    const message =
+                        daysUntilSubStart === 0
+                            ? `Subtask "${subtask.task_name}" sẽ bắt đầu ngay hôm nay.`
+                            : `Subtask "${subtask.task_name}" sẽ bắt đầu trong ${daysUntilSubStart} ngày tới.`;
                     taskMessages.push(message);
                 }
             });

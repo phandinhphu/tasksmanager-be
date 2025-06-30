@@ -11,9 +11,9 @@ const { FRONTEND_URL } = require("../util/constants");
 cron.schedule(
     "0 8,13,18 * * *",
     async () => {
-        const userTasksMap = await getTasksDueSoon();
+        const tasksDueSoon = await getTasksDueSoon();
 
-        Object.values(userTasksMap).forEach(async (userTasks) => {
+        Object.values(tasksDueSoon).forEach(async (userTasks) => {
             if (userTasks.emails.length > 0) {
                 const subject = `Thông báo công việc của bạn - ${new Date().toLocaleDateString()}`;
                 const emailContent = `

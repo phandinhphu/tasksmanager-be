@@ -9,13 +9,23 @@ cron.schedule(
         const tasksDueSoon = await getTasksDueSoon();
         const upcomingTasks = await getUpcomingTasks();
 
-        const userTasksMap = {
-            ...tasksDueSoon,
-            ...upcomingTasks,
-        };
+        // Gửi thông báo cho các task quá hạn hoặc sắp đến hạn
+        for (const userId of Object.keys(tasksDueSoon)) {
+            const userTasks = tasksDueSoon[userId];
 
-        for (const userId of Object.keys(userTasksMap)) {
-            const userTasks = userTasksMap[userId];
+            for (const n of userTasks.notifications) {
+                sendNotification(userId, {
+                    taskId: n.taskId,
+                    taskName: n.taskName,
+                    endDate: n.endDate,
+                    message: n.message,
+                });
+            }
+        }
+
+        // Gửi thông báo cho các task sắp đến hạn trong 3 ngày
+        for (const userId of Object.keys(upcomingTasks)) {
+            const userTasks = upcomingTasks[userId];
 
             for (const n of userTasks.notifications) {
                 sendNotification(userId, {
