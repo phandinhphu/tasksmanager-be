@@ -5,8 +5,20 @@ const LogEmail = require("../apis/models/LogEmail");
 
 // Hàm: Tính số ngày giữa hai ngày
 function getDaysBetween(fromDate, toDate) {
-    const diffTime = toDate.getTime() - fromDate.getTime();
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffMs = toDate.getTime() - fromDate.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays >= 1) {
+        return `trong ${diffDays} ngày nữa`;
+    } else if (diffHours >= 1) {
+        return `trong ${diffHours} giờ nữa`;
+    } else if (diffMinutes >= 1) {
+        return `trong ${diffMinutes} phút nữa`;
+    } else {
+        return "rất sớm (dưới 1 phút)";
+    }
 }
 
 // Hàm: Lấy các task và subtask quá hạn hoặc sắp đến hạn trong 3 ngày
@@ -33,10 +45,12 @@ async function getTasksDueSoon() {
             (taskEnd < now || (taskEnd >= now && taskEnd <= threeDaysLater)) &&
             taskStart <= now
         ) {
+            const daysUntilEndMsg = getDaysBetween(now, taskEnd);
+
             const message =
                 taskEnd < now
                     ? `Task "${task.task_name}" đã quá hạn!`
-                    : `Task "${task.task_name}" sắp đến hạn trong 3 ngày.`;
+                    : `Task "${task.task_name}" sắp đến hạn ${daysUntilEndMsg}.`;
             taskMessages.push(message);
         }
 
@@ -52,10 +66,12 @@ async function getTasksDueSoon() {
                         (subEnd >= now && subEnd <= threeDaysLater)) &&
                     subStart <= now
                 ) {
+                    const daysUntilSubEndMsg = getDaysBetween(now, subEnd);
+
                     const message =
                         subEnd < now
                             ? `Subtask "${subtask.task_name}" đã quá hạn!`
-                            : `Subtask "${subtask.task_name}" sắp đến hạn trong 3 ngày.`;
+                            : `Subtask "${subtask.task_name}" sắp đến hạn ${daysUntilSubEndMsg}.`;
                     taskMessages.push(message);
                 }
             });
@@ -110,13 +126,9 @@ async function getUpcomingTasks() {
         let taskMessages = [];
 
         const taskStart = new Date(task.start_date);
-        const daysUntilStart = getDaysBetween(now, taskStart);
+        const daysUntilStartMsg = getDaysBetween(now, taskStart);
 
-        const message =
-            daysUntilStart === 0
-                ? `Task "${task.task_name}" sẽ bắt đầu ngay hôm nay.`
-                : `Task "${task.task_name}" sẽ bắt đầu trong ${daysUntilStart} ngày tới.`;
-
+        const message = `Task "${task.task_name}" sẽ bắt đầu ${daysUntilStartMsg}.`;
         taskMessages.push(message);
 
         if (task.subtasks && task.subtasks.length > 0) {
@@ -124,12 +136,9 @@ async function getUpcomingTasks() {
                 const subStart = new Date(subtask.start_date);
 
                 if (subStart >= now && subStart <= threeDaysLater) {
-                    const daysUntilSubStart = getDaysBetween(now, subStart);
+                    const daysUntilSubStartMsg = getDaysBetween(now, subStart);
 
-                    const message =
-                        daysUntilSubStart === 0
-                            ? `Subtask "${subtask.task_name}" sẽ bắt đầu ngay hôm nay.`
-                            : `Subtask "${subtask.task_name}" sẽ bắt đầu trong ${daysUntilSubStart} ngày tới.`;
+                    const message = `Subtask "${subtask.task_name}" sẽ bắt đầu ${daysUntilSubStartMsg}.`;
                     taskMessages.push(message);
                 }
             });
