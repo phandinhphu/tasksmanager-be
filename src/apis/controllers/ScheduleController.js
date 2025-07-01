@@ -10,7 +10,7 @@ class ScheduleController {
             const schedules = await scheduleSchema.find({ userid: userId });
             return res.status(200).json(schedules);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!', error });
         }
     }
 
@@ -32,7 +32,7 @@ class ScheduleController {
             await newSchedule.save();
             return res.status(201).json(newSchedule);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 
@@ -56,7 +56,7 @@ class ScheduleController {
 
             return res.status(200).json(updatedSchedule);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 
@@ -73,7 +73,7 @@ class ScheduleController {
 
             return res.status(200).json({ message: 'Schedule deleted successfully' });
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 }

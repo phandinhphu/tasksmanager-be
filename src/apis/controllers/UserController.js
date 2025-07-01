@@ -18,7 +18,7 @@ class UserController {
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+                .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
         }
     }
 
@@ -71,7 +71,7 @@ class UserController {
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+                .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
         }
     }
 
@@ -111,7 +111,7 @@ class UserController {
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+                .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
         }
     }
 
@@ -153,7 +153,7 @@ class UserController {
         } catch (error) {
             return res
                 .status(500)
-                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+                .json({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!!!" });
         }
     }
 }
