@@ -47,7 +47,7 @@ class TaskController {
             // Return the tasks
             return res.status(200).json(newTasks);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!', error });
         }
     }
 
@@ -67,7 +67,7 @@ class TaskController {
 
             return res.status(200).json(task);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 
@@ -91,7 +91,7 @@ class TaskController {
             await newTask.save();
             return res.status(201).json(newTask);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 
@@ -118,7 +118,7 @@ class TaskController {
 
             return res.status(200).json(updatedTask);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 
@@ -144,7 +144,7 @@ class TaskController {
 
             return res.status(200).json(updatedTask);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!', error });
         }
     }
 
@@ -176,7 +176,7 @@ class TaskController {
 
             return res.status(200).json(task);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 
@@ -204,7 +204,7 @@ class TaskController {
 
             return res.status(200).json({ message: 'Task deleted successfully' });
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 
@@ -214,7 +214,7 @@ class TaskController {
             const statuses = await statusSchema.find();
             return res.status(200).json(statuses);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 
@@ -224,7 +224,7 @@ class TaskController {
             const priorities = await prioritySchema.find();
             return res.status(200).json(priorities);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 
@@ -263,7 +263,7 @@ class TaskController {
 
             return res.status(200).json(stats);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({ message: 'Có lỗi xảy ra. Vui lòng thử lại sau!!!' });
         }
     }
 }
