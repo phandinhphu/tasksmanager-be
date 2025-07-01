@@ -1,26 +1,31 @@
-const taskSchema = require('../models/Task');
-const statusSchema = require('../models/Status');
-const scheduleSchema = require('../models/Schedule');
+const Schedule = require('../models/Schedule');
 
 class ScheduleController {
-    // [GET] /schedules/me
+    // get /schedules/me
     async getMySchedules(req, res) {
         try {
-            const userId = req.user._id;
-            const schedules = await scheduleSchema.find({ userid: userId });
+            const userId = req.user.id || req.user._id;
+            const schedules = await Schedule.find({ userid: userId });
             return res.status(200).json(schedules);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!', error });
+            return res.status(500).json({
+                message: 'Lỗi khi lấy danh sách lịch trình!',
+                error: error.message
+            });
         }
     }
 
-    // [POST] /schedules/create
+    // post /schedules/create
     async createSchedule(req, res) {
         try {
             const { title, days, startTime, endTime, repeat } = req.body;
-            const userId = req.user._id;
+            const userId = req.user.id || req.user._id;
 
-            const newSchedule = new scheduleSchema({
+            if (!title || !days || !startTime || !endTime || !repeat) {
+                return res.status(400).json({ message: 'Thiếu dữ liệu bắt buộc.' });
+            }
+
+            const newSchedule = new Schedule({
                 title,
                 userid: userId,
                 days,
@@ -32,48 +37,60 @@ class ScheduleController {
             await newSchedule.save();
             return res.status(201).json(newSchedule);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({
+                message: 'Không thể tạo lịch trình mới!',
+                error: error.message
+            });
         }
     }
 
-    // [PUT] /schedules/:id
+    // put /schedules/:id
     async updateSchedule(req, res) {
         try {
             const scheduleId = req.params.id;
+            const userId = req.user.id || req.user._id;
             const { title, days, startTime, endTime, repeat } = req.body;
 
-            const updatedSchedule = await scheduleSchema.findByIdAndUpdate(scheduleId, {
-                title,
-                days,
-                startTime,
-                endTime,
-                repeat
-            }, { new: true });
+            const updatedSchedule = await Schedule.findOneAndUpdate(
+                { _id: scheduleId, userid: userId },
+                { title, days, startTime, endTime, repeat },
+                { new: true }
+            );
 
             if (!updatedSchedule) {
-                return res.status(404).json({ message: 'Schedule not found' });
+                return res.status(404).json({ message: 'Không tìm thấy lịch trình hoặc bạn không có quyền chỉnh sửa.' });
             }
 
             return res.status(200).json(updatedSchedule);
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({
+                message: 'Cập nhật lịch trình thất bại!',
+                error: error.message
+            });
         }
     }
 
-    // [DELETE] /schedules/:id
+    // delete /schedules/:id
     async deleteSchedule(req, res) {
         try {
             const scheduleId = req.params.id;
+            const userId = req.user.id || req.user._id;
 
-            const deletedSchedule = await scheduleSchema.findByIdAndDelete(scheduleId);
+            const deletedSchedule = await Schedule.findOneAndDelete({
+                _id: scheduleId,
+                userid: userId
+            });
 
             if (!deletedSchedule) {
-                return res.status(404).json({ message: 'Schedule not found' });
+                return res.status(404).json({ message: 'Không tìm thấy lịch trình hoặc bạn không có quyền xóa.' });
             }
 
-            return res.status(200).json({ message: 'Schedule deleted successfully' });
+            return res.status(200).json({ message: 'Xóa lịch trình thành công.' });
         } catch (error) {
-            return res.status(500).json({ message: 'Có lôĩ xảy ra. Vui lòng thử lại sao!!!' });
+            return res.status(500).json({
+                message: 'Xóa lịch trình thất bại!',
+                error: error.message
+            });
         }
     }
 }

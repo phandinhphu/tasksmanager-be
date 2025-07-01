@@ -1,14 +1,36 @@
 const express = require('express');
-const route = express.Router();
+const router = express.Router();
 const ScheduleController = require('../apis/controllers/ScheduleController');
-
 const verifyToken = require('../middleware/auth');
 
-route.use(verifyToken);
+router.use(verifyToken);
 
-route.get('/me', ScheduleController.getMySchedules);
-route.post('/create', ScheduleController.createSchedule);
-route.put('/:id', ScheduleController.updateSchedule);
-route.delete('/:id', ScheduleController.deleteSchedule);
+/**
+ * @route   GET /api/schedules/me
+ * @desc    Lấy tất cả lịch trình của người dùng hiện tại
+ * @access  Private
+ */
+router.get('/me', ScheduleController.getMySchedules);
 
-module.exports = route;
+/**
+ * @route   POST /api/schedules/create
+ * @desc    Tạo lịch trình mới cho người dùng hiện tại
+ * @access  Private
+ */
+router.post('/create', ScheduleController.createSchedule);
+
+/**
+ * @route   PUT /api/schedules/:id
+ * @desc    Cập nhật lịch trình theo ID
+ * @access  Private
+ */
+router.put('/:id', ScheduleController.updateSchedule);
+
+/**
+ * @route   DELETE /api/schedules/:id
+ * @desc    Xóa lịch trình theo ID
+ * @access  Private
+ */
+router.delete('/:id', ScheduleController.deleteSchedule);
+
+module.exports = router;
