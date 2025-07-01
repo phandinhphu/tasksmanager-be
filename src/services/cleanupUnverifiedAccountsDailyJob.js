@@ -22,7 +22,7 @@ cron.schedule(
                             ${result
                                 .map(
                                     (user) =>
-                                        `<li>Id: ${user._id} | Email: ${user.email} | Username: ${user.username}</li>`
+                                        `<li>Id: ${user._id} | Email: ${user.email} | Username: ${user.name}</li>`
                                 )
                                 .join("")}
                         </ul>
