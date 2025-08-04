@@ -6,7 +6,7 @@ const connectDB = require("./config/db");
 const { PORT } = require("./util/constants");
 
 // cron job
-require("./services/job");
+// require("./services/job");
 
 const server = http.createServer(app);
 socketManager.init(server); // Khởi tạo socket
