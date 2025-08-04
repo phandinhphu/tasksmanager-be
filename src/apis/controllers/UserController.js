@@ -156,6 +156,28 @@ class UserController {
                 .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
         }
     }
+
+    // [GET] user/check-exist
+    async checkUserExist(req, res, next) {
+        const { email } = req.query;
+
+        try {
+            if (!email) {
+                return res.status(400).json({ message: "Email is required" });
+            }
+
+            const user = await userSchema.findOne({ email });
+            if (user) {
+                return res.status(200).json({ exists: true });
+            } else {
+                return res.status(200).json({ exists: false });
+            }
+        } catch (error) {
+            return res
+                .status(500)
+                .json({ message: "Có lôĩ xảy ra. Vui lòng thử lại sao!!!" });
+        }
+    }
 }
 
 module.exports = new UserController();

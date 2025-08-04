@@ -5,6 +5,8 @@ const UserController = require("../apis/controllers/UserController");
 const verifyToken = require("../middleware/auth");
 const feedbackLimiter = require("../middleware/feedbackLimiter");
 
+route.get("/check-exist", UserController.checkUserExist);
+
 route.use(verifyToken);
 
 route.get("/me", UserController.getMe);

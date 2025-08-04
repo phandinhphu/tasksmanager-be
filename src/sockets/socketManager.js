@@ -29,6 +29,28 @@ function init(server) {
                 }
             }
         });
+
+        // Chat
+        // Join a room
+        socket.on("joinRoom", (roomId) => {
+            socket.join(roomId);
+            console.log(`Socket ${socket.id} joined room ${roomId}`);
+        });
+
+        // Leave a room
+        socket.on("leaveRoom", (roomId) => {
+            socket.leave(roomId);
+            console.log(`Socket ${socket.id} left room ${roomId}`);
+        });
+
+        // Send message to a room
+        socket.on("sendMessage", (data) => {
+            io.to(data.roomId).emit("receiveMessage", {
+                roomId: data.roomId,
+                content: data.content,
+                sender: data.sender, // or use userId if available
+            });
+        });
     });
 }
 
